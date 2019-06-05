@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>HCNetSDK</id>
+        <version>1.0.0</version>
+		<title>Hikvision HCNetSDK for Xamarin.Android</title>
+        <description>Xamarin.Android Bindings for the Hikvision HCNetSDK</description>
+        <authors>Sergio Joel Ferreras Batista</authors>
+		<owners>Eyeson Digital LLC.</owners>
+		<copyright>Copyright ©2019 Eyeson Digital LLC.</copyright>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<releaseNotes>Initial implementation</releaseNotes>
+		<tags>Xamarin, Android</tags>
+    </metadata>
+	<files>
+		<file src="C:\EyesonDigitalProject\Bindings\Android\HCNetSDK\HCNetSDK\bin\Release\HCNetSDK.dll" target="lib\MonoAndroid81"/>
+		<file src="C:\EyesonDigitalProject\Bindings\Android\HCNetSDK\HCNetSDK\bin\Release\HCNetSDK.pdb" target="lib\MonoAndroid81"/>
+	</files>
+</package>
