@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>test Player</title>
+    <meta charset="utf-8">
+  </head>
+  <body>
+  <script>
+
+var postData = {
+      username: 'eyeson',
+      password: '2004eyeson',
+      ip: '50.78.124.78',
+      port: '8001',
+      camera: '6',
+      date: '2019-05-01T12:00:00.000Z'
+};
+
+let headers = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+axios.post('http://192.168.0.9:7555', postData, {"headers" : headers})
+
+   .then((response) => {
+            dispatch({type: FOUND_USER, data: response.data[0]})
+        })
+        .catch((error) => {
+            dispatch({type: ERROR_FINDING_USER})
+        });
+</script> 
+
+  </body>
+</html>
