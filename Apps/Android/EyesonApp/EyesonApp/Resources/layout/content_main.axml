@@ -184,6 +184,7 @@
                 android:layout_below="@+id/btn_Playback"
                 android:layout_alignLeft="@+id/btn_Playback"
                 android:layout_marginLeft="-3dp"
+                android:visibility="invisible"
                 android:layout_marginTop="33dp"
                 android:text="Sub(CIF)"
                 android:textColor="#ff000000"
