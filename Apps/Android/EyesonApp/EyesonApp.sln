@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28822.285
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EyesonApp", "EyesonApp\EyesonApp.csproj", "{93AF6B5C-2337-4195-8204-A5C346D1D90A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{93AF6B5C-2337-4195-8204-A5C346D1D90A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93AF6B5C-2337-4195-8204-A5C346D1D90A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93AF6B5C-2337-4195-8204-A5C346D1D90A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{93AF6B5C-2337-4195-8204-A5C346D1D90A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93AF6B5C-2337-4195-8204-A5C346D1D90A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93AF6B5C-2337-4195-8204-A5C346D1D90A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EA44540F-0B7C-40FC-849E-41454FAC8F20}
+	EndGlobalSection
+EndGlobal
