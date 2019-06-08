@@ -328,3 +328,10 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+Docs/
+Nuget_Packages/Shared/HCNetSDK/HCNetSDK/HCNetSDK.csproj
+Nuget_Packages/Shared/HCNetSDK/HCNetSDK/Class1.cs
+Nuget_Packages/Shared/HCNetSDK/HCNetSDK.sln
+Bindings/Shared/HCNetSDK/HCNetSDK/HCNetSDK.csproj
+Bindings/Shared/HCNetSDK/HCNetSDK/Class1.cs
+Bindings/Shared/HCNetSDK/HCNetSDK.sln
