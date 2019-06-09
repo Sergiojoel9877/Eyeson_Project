@@ -11,6 +11,7 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Com.Hikvision.Netsdk;
+using EyesonApp;
 
 namespace EyesonApp.Controls
 {
@@ -30,7 +31,7 @@ namespace EyesonApp.Controls
         public int M_lUserID = -1;
         public int M_iChan = 0;
 
-        public PlaySurfaceView(DemoActivity context) : base(context)
+        public PlaySurfaceView(MainActivity context) : base(context)
         {
             M_hHolder = this.Holder;
             Holder.AddCallback(this);
