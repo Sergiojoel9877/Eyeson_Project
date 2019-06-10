@@ -11,19 +11,21 @@ using Android.OS;
 using Android.Runtime;
 using Android.Support.Design.Widget;
 using Android.Support.V7.App;
+using Android.Text;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
 using Com.Hikvision.Netsdk;
 using EyesonApp.Controls;
 using EyesonApp.Services;
+using Java.Lang;
 using Java.Util;
 using Org.MediaPlayer.PlayM4;
 
 namespace EyesonApp
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
-    public class MainActivity : AppCompatActivity, IExceptionCallBack
+    public class MainActivity : AppCompatActivity, IExceptionCallBack, ITextWatcher
     {
         private static Button m_oLoginBtn = null;
         private static Button m_oPreviewBtn = null;
@@ -75,10 +77,6 @@ namespace EyesonApp
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            new Thread(new ThreadStart(()=> {
-                AsynchronousSocketListener.StartListening();
-            })).Start();
-
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
 
@@ -87,6 +85,8 @@ namespace EyesonApp
 
             FloatingActionButton fab = FindViewById<FloatingActionButton>(Resource.Id.fab);
             fab.Click += FabOnClick;
+
+            StartSocketListening();
 
             if (!InitSDK())
             {
@@ -99,6 +99,13 @@ namespace EyesonApp
             }
 
             SetIPAddressToIPLabel();
+        }
+
+        private void StartSocketListening()
+        {
+            new System.Threading.Thread(new ThreadStart(() => {
+                AsynchronousSocketListener.StartListening();
+            })).Start();
         }
 
         private void SetIPAddressToIPLabel()
@@ -131,8 +138,8 @@ namespace EyesonApp
                     m_oPsd.Text = _result.Password;
                     m_oUser.Text = _result.Username;
                     ParseDate(_result.Date);
-                    m_oTime.Text = new StringBuilder().Append(Hour).Append(":").Append(Minute).ToString();
-                    m_oDate.Text = new StringBuilder().Append(Day).Append("/").Append(Month).Append("/").Append(Year).ToString();
+                    m_oTime.Text = new System.Text.StringBuilder().Append(Hour).Append(":").Append(Minute).ToString();
+                    m_oDate.Text = new System.Text.StringBuilder().Append(Day).Append("/").Append(Month).Append("/").Append(Year).ToString();
 
                     m_iStartChan = Convert.ToInt32(m_oCam.Text) - 1;
                 });
@@ -227,6 +234,67 @@ namespace EyesonApp
             m_oDate = (EditText)FindViewById(Resource.Id.EDT_Date);
             m_oTime = (EditText)FindViewById(Resource.Id.EDT_Hr);
             m_IPAdrs = (TextView)FindViewById(Resource.Id.ipPlaceHolder);
+
+            m_oDate.FocusChange += M_oDate_FocusChange;
+            m_oTime.FocusChange += M_oTime_FocusChange;
+
+            m_oCam.AddTextChangedListener(this);
+        }
+
+        private void M_oCam_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
+        {
+
+        }
+
+        private void M_oTime_FocusChange(object sender, View.FocusChangeEventArgs e)
+        {
+            ShowDialog(998);
+        }
+
+        private void M_oDate_FocusChange(object sender, View.FocusChangeEventArgs e)
+        {
+            ShowDialog(999);
+        }
+
+        protected override Dialog OnCreateDialog(int id)
+        {
+            if (id == 999)
+            {
+                return new DatePickerDialog(this, DateListener, Year, Month, Day);
+            }
+            if (id == 998)
+            {
+                return new TimePickerDialog(this, TimeListener, Hour, Minute, false);
+            }
+            return base.OnCreateDialog(id); 
+        }
+
+        private void TimeListener(object sender, TimePickerDialog.TimeSetEventArgs e)
+        {
+            ShowTime(e.HourOfDay, e.Minute);
+        }
+
+        private void ShowTime(int hourOfDay, int minute)
+        {
+            Hour = hourOfDay;
+            Minute = minute;
+
+            m_oTime.Text = new System.Text.StringBuilder().Append(hourOfDay).Append(":")
+                    .Append(minute).ToString();
+        }
+
+        private void DateListener(object sender, DatePickerDialog.DateSetEventArgs e)
+        {
+            ShowDate(e.Year, e.Month + 1, e.DayOfMonth);
+        }
+
+        private void ShowDate(int year, int v, int dayOfMonth)
+        {
+            Year = year;
+            Month = v;
+            Day = dayOfMonth;
+
+            m_oDate.Text = new System.Text.StringBuilder().Append(dayOfMonth).Append("/").Append(v).Append("/").Append(year).ToString();
         }
 
         private void SetListeners()
@@ -283,7 +351,7 @@ namespace EyesonApp
                     }
                 }
             }
-            catch (Exception er)
+            catch (System.Exception er)
             {
                 Log.Error("", "Error: " + er.ToString());
             }
@@ -322,7 +390,7 @@ namespace EyesonApp
                     m_iLogID = -1;
                 }
             }
-            catch (Exception er)
+            catch (System.Exception er)
             {
                 Log.Error("", "error: " + er.ToString());
             }
@@ -521,6 +589,24 @@ namespace EyesonApp
         public void FExceptionCallBack(int p0, int p1, int p2)
         {
             throw new NotImplementedException();
+        }
+
+        public void AfterTextChanged(IEditable s)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void BeforeTextChanged(ICharSequence s, int start, int count, int after)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnTextChanged(ICharSequence s, int start, int before, int count)
+        {
+            if (s.Length() > 0)
+            {
+                m_iStartChan = Convert.ToInt32(s.ToString()) - 1;
+            }
         }
     }
 }
