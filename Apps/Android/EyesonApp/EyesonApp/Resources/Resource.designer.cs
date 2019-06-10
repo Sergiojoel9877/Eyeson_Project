@@ -2636,14 +2636,14 @@ namespace EyesonApp
 			// aapt resource value: 0x7f08003d
 			public const int bottom = 2131230781;
 			
-			// aapt resource value: 0x7f0800a7
-			public const int btn_Capture = 2131230887;
+			// aapt resource value: 0x7f0800a6
+			public const int btn_Capture = 2131230886;
 			
 			// aapt resource value: 0x7f0800a3
 			public const int btn_Login = 2131230883;
 			
-			// aapt resource value: 0x7f0800a6
-			public const int btn_Playback = 2131230886;
+			// aapt resource value: 0x7f0800a5
+			public const int btn_Playback = 2131230885;
 			
 			// aapt resource value: 0x7f0800a4
 			public const int btn_Preview = 2131230884;
@@ -2801,8 +2801,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f080057
 			public const int invisible = 2131230807;
 			
-			// aapt resource value: 0x7f0800a5
-			public const int ipPlaceHolder = 2131230885;
+			// aapt resource value: 0x7f0800a7
+			public const int ipPlaceHolder = 2131230887;
 			
 			// aapt resource value: 0x7f080066
 			public const int italic = 2131230822;
