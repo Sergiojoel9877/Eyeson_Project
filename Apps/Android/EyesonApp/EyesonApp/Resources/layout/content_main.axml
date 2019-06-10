@@ -17,7 +17,7 @@
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            
+
             <EditText
                 android:id="@+id/EDT_IPAddr"
                 android:layout_width="139dp"
@@ -51,7 +51,7 @@
                 android:text=""
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/EDT_IPAddr" />
-       
+
             <EditText
                 android:id="@+id/EDT_Psd"
                 android:layout_width="139dp"
@@ -97,7 +97,7 @@
 
             <EditText
                 android:id="@+id/EDT_Hr"
-                android:layout_width="108dp"
+                android:layout_width="139dp"
                 android:layout_height="39dp"
                 android:layout_marginStart="44dp"
                 android:layout_marginTop="16dp"
@@ -121,33 +121,33 @@
                 android:id="@+id/btn_Preview"
                 android:layout_width="107dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="80dp"
                 android:text="Preview"
                 android:textColor="#ff000000"
                 android:typeface="sans"
                 app:layout_constraintStart_toEndOf="@+id/btn_Login"
-                app:layout_constraintTop_toBottomOf="@+id/ipPlaceHolder" />
+                app:layout_constraintTop_toBottomOf="@+id/EDT_Hr" />
 
             <Button
                 android:id="@+id/btn_Playback"
-                android:layout_width="wrap_content"
-                android:layout_height="49dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="76dp"
-                android:layout_marginEnd="8dp"
+                android:layout_width="107dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="80dp"
+                android:layout_marginEnd="16dp"
                 android:text="Playback"
                 android:textColor="#ff000000"
                 android:typeface="sans"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.076"
+                app:layout_constraintHorizontal_bias="0.125"
                 app:layout_constraintStart_toEndOf="@+id/btn_Preview"
                 app:layout_constraintTop_toBottomOf="@+id/EDT_Hr" />
 
             <Button
                 android:id="@+id/btn_Capture"
                 android:layout_width="107dp"
-                android:layout_height="47dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="8dp"
@@ -160,9 +160,9 @@
             <Button
                 android:id="@+id/btn_Record"
                 android:layout_width="108dp"
-                android:layout_height="49dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="12dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="9dp"
                 android:text="Record"
                 app:layout_constraintStart_toEndOf="@+id/btn_Capture"
                 app:layout_constraintTop_toBottomOf="@+id/btn_Preview" />
@@ -171,17 +171,25 @@
                 android:id="@+id/ipPlaceHolder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="44dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
                 android:ellipsize="marquee"
                 android:fadingEdge="horizontal"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:marqueeRepeatLimit="marquee_forever"
+                android:maxLines="1"
                 android:scrollHorizontally="true"
                 android:singleLine="true"
-                android:layout_marginTop="32dp"
                 android:text="IP ADDRESS: "
-                app:layout_constraintStart_toEndOf="@+id/EDT_Cam"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_Hr" />
-       
+                app:layout_constraintBottom_toTopOf="@+id/Sur_Player"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.075"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_Capture" />
+
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>
