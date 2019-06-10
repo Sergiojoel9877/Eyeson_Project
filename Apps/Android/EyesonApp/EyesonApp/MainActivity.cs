@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Net;
+using System.Text;
+using System.Threading;
 using Android.App;
 using Android.Content;
+using Android.Icu.Text;
 using Android.Icu.Util;
+using Android.Net.Wifi;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.Design.Widget;
@@ -11,6 +16,8 @@ using Android.Views;
 using Android.Widget;
 using Com.Hikvision.Netsdk;
 using EyesonApp.Controls;
+using EyesonApp.Services;
+using Java.Util;
 using Org.MediaPlayer.PlayM4;
 
 namespace EyesonApp
@@ -18,62 +25,62 @@ namespace EyesonApp
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
     public class MainActivity : AppCompatActivity, IExceptionCallBack
     {
-        private Button m_oLoginBtn = null;
-        private Button m_oPreviewBtn = null;
-        private Button m_oPlaybackBtn = null;
-        private Button m_oParamCfgBtn = null;
-        private Button m_oCaptureBtn = null;
-        private Button m_oRecordBtn = null;
-        private Button m_oTalkBtn = null;
-        private Button m_oPTZBtn = null;
-        private Button m_oOtherBtn = null;
-        private EditText m_oIPAddr = null;
-        private EditText m_oPort = null;
-        private EditText m_oUser = null;
-        private EditText m_oPsd = null;
-        private EditText m_oCam = null;
-        private EditText m_oDate = null;
-        private EditText m_oTime = null;
-        private TextView m_IPAdrs = null;
-        private TimePicker timePicker;
-        private DatePicker datePicker;
-        private Calendar calendar;
+        private static Button m_oLoginBtn = null;
+        private static Button m_oPreviewBtn = null;
+        private static Button m_oPlaybackBtn = null;
+        private static Button m_oParamCfgBtn = null;
+        private static Button m_oCaptureBtn = null;
+        private static Button m_oRecordBtn = null;
+        private static Button m_oTalkBtn = null;
+        private static Button m_oPTZBtn = null;
+        private static Button m_oOtherBtn = null;
+        private static EditText m_oIPAddr = null;
+        private static EditText m_oPort = null;
+        private static EditText m_oUser = null;
+        private static EditText m_oPsd = null;
+        private static EditText m_oCam = null;
+        private static EditText m_oDate = null;
+        private static EditText m_oTime = null;
+        private static TextView m_IPAdrs = null;
+        private static TimePicker timePicker;
+        private static DatePicker datePicker;
+        private Android.Icu.Util.Calendar calendar;
         private NET_DVR_DEVICEINFO_V30 m_oNetDvrDeviceInfoV30 = null;
 
-        private int m_iLogID = -1; // return by NET_DVR_Login_v30
-        private int m_iPlayID = -1; // return by NET_DVR_RealPlay_V30
-        private int m_iPlaybackID = -1; // return by NET_DVR_PlayBackByTime
+        private static int m_iLogID = -1; // return by NET_DVR_Login_v30
+        private static int m_iPlayID = -1; // return by NET_DVR_RealPlay_V30
+        private static int m_iPlaybackID = -1; // return by NET_DVR_PlayBackByTime
+                 
+        private static int m_iPort = -1; // play port
+                 
+        private static bool m_bTalkOn = false;
+        private static bool m_bPTZL = false;
+        private static bool m_bMultiPlay = false;
+                 
+        private static bool m_bNeedDecode = true;
+        private static bool m_bSaveRealData = false;
+        private static bool m_bStopPlayback = false;
 
-        private int m_iPort = -1; // play port
+        private static int Year { get; set; }
+        private static int Month { get; set; }
+        private static int Day { get; set; }
+                
+        private static int Hour { get; set; }
+        private static int Minute { get; set; }
 
-        private bool m_bTalkOn = false;
-        private bool m_bPTZL = false;
-        private bool m_bMultiPlay = false;
+        private static int m_iStartChan { get; set; } = 0; // start channel no
+        private static int m_iChanNum { get; set; } = 0; // channel number
 
-        private bool m_bNeedDecode = true;
-        private bool m_bSaveRealData = false;
-        private bool m_bStopPlayback = false;
-
-        public int getM_iStartChan()
-        {
-            return m_iStartChan;
-        }
-
-        public void setM_iStartChan(int m_iStartChan)
-        {
-            this.m_iStartChan = m_iStartChan;
-        }
-
-        private int m_iStartChan = 0; // start channel no
-        private int m_iChanNum = 0; // channel number
         private static PlaySurfaceView[] playView = new PlaySurfaceView[4];
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            new Thread(new ThreadStart(()=> {
+                AsynchronousSocketListener.StartListening();
+            })).Start();
+
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
-
-            Xamarin.Essentials.Platform.Init(this, savedInstanceState);
 
             Android.Support.V7.Widget.Toolbar toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
@@ -90,6 +97,55 @@ namespace EyesonApp
             {
                 Finish();
             }
+
+            SetIPAddressToIPLabel();
+        }
+
+        private void SetIPAddressToIPLabel()
+        {
+            var IP = GetIP();
+            m_IPAdrs.Text = m_IPAdrs.Text + ":" + IP + " Port: 7555";
+            m_IPAdrs.Selected = true;
+        }
+
+        private string GetIP()
+        {
+            WifiManager manager = (WifiManager)GetSystemService(Service.WifiService);
+            int ip = manager.ConnectionInfo.IpAddress;
+
+            string ipaddress = Android.Text.Format.Formatter.FormatIpAddress(ip);
+            return ipaddress;
+        }
+
+        public static void SetDataToControls()
+        {
+            var _result = DataSingleton.Instance();
+
+            using (var h = new Handler(Looper.MainLooper))
+            {
+                h.Post(()=>
+                {
+                    m_oCam.Text = Convert.ToString(_result.Camera);
+                    m_oIPAddr.Text = _result.Ip;
+                    m_oPort.Text = Convert.ToString(_result.Port);
+                    m_oPsd.Text = _result.Password;
+                    m_oUser.Text = _result.Username;
+                    ParseDate(_result.Date);
+                    m_oTime.Text = new StringBuilder().Append(Hour).Append(":").Append(Minute).ToString();
+                    m_oDate.Text = new StringBuilder().Append(Day).Append("/").Append(Month).Append("/").Append(Year).ToString();
+
+                    m_iStartChan = Convert.ToInt32(m_oCam.Text) - 1;
+                });
+            }
+        }
+
+        private static void ParseDate(DateTimeOffset date)
+        {
+            Hour = date.Hour;
+            Minute = date.Minute;
+            Month = date.Month;
+            Year = date.Year;
+            Day = date.Day;
         }
 
         static MainActivity()
