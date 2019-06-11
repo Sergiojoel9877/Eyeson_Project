@@ -2,6 +2,7 @@
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.Icu.Text;
@@ -78,7 +79,10 @@ namespace EyesonApp
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-            SetContentView(Resource.Layout.activity_main);
+
+            LayoutInflater inflater = LayoutInflater.From(this);
+            View main = inflater.Inflate(Resource.Layout.activity_main, null);
+            SetContentView(main);
 
             Android.Support.V7.Widget.Toolbar toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
@@ -220,12 +224,8 @@ namespace EyesonApp
             m_oLoginBtn = (Button)FindViewById(Resource.Id.btn_Login);
             m_oPreviewBtn = (Button)FindViewById(Resource.Id.btn_Preview);
             m_oPlaybackBtn = (Button)FindViewById(Resource.Id.btn_Playback);
-            //m_oParamCfgBtn = (Button)FindViewById(Resource.Id.btn_ParamCfg);
             m_oCaptureBtn = (Button)FindViewById(Resource.Id.btn_Capture);
             m_oRecordBtn = (Button)FindViewById(Resource.Id.btn_Record);
-            //m_oTalkBtn = (Button)FindViewById(Resource.Id.btn_Talk);
-            //m_oPTZBtn = (Button)FindViewById(Resource.Id.btn_PTZ);
-            //m_oOtherBtn = (Button)FindViewById(Resource.Id.btn_OTHER);
             m_oIPAddr = (EditText)FindViewById(Resource.Id.EDT_IPAddr);
             m_oPort = (EditText)FindViewById(Resource.Id.EDT_Port);
             m_oUser = (EditText)FindViewById(Resource.Id.EDT_User);
@@ -234,11 +234,40 @@ namespace EyesonApp
             m_oDate = (EditText)FindViewById(Resource.Id.EDT_Date);
             m_oTime = (EditText)FindViewById(Resource.Id.EDT_Hr);
             m_IPAdrs = (TextView)FindViewById(Resource.Id.ipPlaceHolder);
+          
+        }
 
-            m_oDate.FocusChange += M_oDate_FocusChange;
-            m_oTime.FocusChange += M_oTime_FocusChange;
-
-            m_oCam.AddTextChangedListener(this);
+        private void M_oRecordBtn_Click(object sender, EventArgs e)
+        {
+            if (!m_bSaveRealData)
+            {
+                // Documents folder
+                string documentsPath = System.Environment.GetFolderPath( System.Environment.SpecialFolder.MyVideos) + "/test.mp4";
+                if (!HCNetSDK.Instance.NET_DVR_SaveRealData(m_iPlayID, documentsPath))
+                {
+                    Console.WriteLine("NET_DVR_SaveRealData failed! error: " + HCNetSDK.Instance.NET_DVR_GetLastError());
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("NET_DVR_SaveRealData success!");
+                }
+                m_bSaveRealData = true;
+            }
+            else
+            {
+                if (!HCNetSDK.Instance.NET_DVR_StopSaveRealData(m_iPlayID))
+                {
+                    Console.WriteLine("NET_DVR_StopSaveRealData failed! error: "
+                                    + HCNetSDK.Instance
+                                            .NET_DVR_GetLastError());
+                }
+                else
+                {
+                    Console.WriteLine("NET_DVR_SaveRealData success!");
+                }
+                m_bSaveRealData = false;
+            }
         }
 
         private void M_oCam_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
@@ -301,60 +330,69 @@ namespace EyesonApp
         {
             m_oLoginBtn.Click += Login_Listener;
             m_oPreviewBtn.Click += Preview_Listener;
+            m_oRecordBtn.Click += M_oRecordBtn_Click;
+
+            m_oDate.FocusChange += M_oDate_FocusChange;
+            m_oTime.FocusChange += M_oTime_FocusChange;
+
+            m_oCam.AddTextChangedListener(this);
         }
 
         private void Preview_Listener(object sender, EventArgs e)
         {
-            try
+            Task.Run(async ()=>
             {
-                if (m_iLogID < 0)
+                try
                 {
-                    Log.Error("", "Please login in device first");
-                    return;
-                }
-                if (m_iPlaybackID >= 0)
-                {
-                    Log.Info("", "Please stop palyback first");
-                    return;
-                }
-
-                if (m_bNeedDecode)
-                {
-                    if (m_iChanNum > 1) //Preview more than a channel
+                    if (m_iLogID < 0)
                     {
-                        //CAMERA INDEX
-                        if (!m_bMultiPlay)
-                        {
-                            StartMultiplePreview(4);
+                        Log.Error("", "Please login in device first");
+                        return;
+                    }
+                    if (m_iPlaybackID >= 0)
+                    {
+                        Log.Info("", "Please stop palyback first");
+                        return;
+                    }
 
-                            m_bMultiPlay = true;
-                            m_oPreviewBtn.Text = "Stop";
+                    if (m_bNeedDecode)
+                    {
+                        if (m_iChanNum > 1) //Preview more than a channel
+                        {
+                            //CAMERA INDEX
+                            if (!m_bMultiPlay)
+                            {
+                                await StartMultiplePreview(4);
+
+                                m_bMultiPlay = true;
+                                m_oPreviewBtn.Text = "Stop";
+                            }
+                            else
+                            {
+                                StopmultiPreview();
+                                m_bMultiPlay = false;
+                                m_oPreviewBtn.Text = "Preview";
+                            }
                         }
                         else
                         {
-                            StopmultiPreview();
-                            m_bMultiPlay = false;
-                            m_oPreviewBtn.Text = "Preview";
-                        }
-                    }
-                    else
-                    {
-                        if (m_iPlayID < 0)
-                        {
-                            StartSinglePreview();
-                        }
-                        else
-                        {
-                            StopSinglePreview();
-                            m_oPreviewBtn.Text = "Preview";
+                            if (m_iPlayID < 0)
+                            {
+                                await StartSinglePreview();
+                            }
+                            else
+                            {
+                                StopSinglePreview();
+                                m_oPreviewBtn.Text = "Preview";
+                            }
                         }
                     }
                 }
-            }
-            catch (System.Exception er)
-            {
-                Log.Error("", "Error: " + er.ToString());
-            }
+                catch (System.Exception er)
+                {
+                    Log.Error("", "Error: " + er.ToString());
+                }
+            });
         }
 
         private void Login_Listener(object sender, EventArgs e)
@@ -415,12 +453,12 @@ namespace EyesonApp
             m_iPlayID = -1;
         }
 
-        private void StartSinglePreview()
+        private Task StartSinglePreview()
         {
             if (m_iPlaybackID >= 0)
             {
                 Log.Info("", "Please stop plaback first");
-                return;
+                return Task.CompletedTask;
             }
 
             Log.Info("", "m_iStartChan: " + m_iStartChan);
@@ -437,11 +475,13 @@ namespace EyesonApp
             if (m_iPlaybackID < 0)
             {
                 Log.Error("", "NET_DVR_RealPlay is failed!Err: " + HCNetSDK.Instance.NET_DVR_GetLastError());
-                return;
+                return Task.CompletedTask;
             }
 
             Log.Info("", "NetSdk Play sucess ***********************3***************************");
             m_oPreviewBtn.Text = "Stop";
+
+            return Task.CompletedTask;
         }
 
         private void StopmultiPreview()
@@ -453,7 +493,7 @@ namespace EyesonApp
             m_iPlayID = -1;
         }
 
-        private void StartMultiplePreview(int index)
+        private Task StartMultiplePreview(int index)
         {
             for (int i = 0; i < index; i++)
             {
@@ -461,6 +501,8 @@ namespace EyesonApp
             }
 
             m_iPlayID = playView[0].M_iPreviewHandle;
+
+            return Task.CompletedTask;
         }
         private int LoginDevice()
         {
@@ -588,17 +630,17 @@ namespace EyesonApp
 
         public void FExceptionCallBack(int p0, int p1, int p2)
         {
-            throw new NotImplementedException();
+     
         }
 
         public void AfterTextChanged(IEditable s)
         {
-            throw new NotImplementedException();
+           
         }
 
         public void BeforeTextChanged(ICharSequence s, int start, int count, int after)
         {
-            throw new NotImplementedException();
+  
         }
 
         public void OnTextChanged(ICharSequence s, int start, int before, int count)
