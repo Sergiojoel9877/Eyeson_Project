@@ -15,6 +15,7 @@ using Android.Support.V7.App;
 using Android.Text;
 using Android.Util;
 using Android.Views;
+using Android.Views.InputMethods;
 using Android.Widget;
 using Com.Hikvision.Netsdk;
 using EyesonApp.Controls;
@@ -73,6 +74,7 @@ namespace EyesonApp
 
         private static int m_iStartChan { get; set; } = 0; // start channel no
         private static int m_iChanNum { get; set; } = 0; // channel number
+        public bool CanShowDateDialog { get; private set; }
 
         private static PlaySurfaceView[] playView = new PlaySurfaceView[4];
 
@@ -172,7 +174,7 @@ namespace EyesonApp
         private void FabOnClick(object sender, EventArgs eventArgs)
         {
             View view = (View)sender;
-            Snackbar.Make(view, "Replace with your own action", Snackbar.LengthLong)
+            Snackbar.Make(view, "Eyeson App Beta 1.0.0", Snackbar.LengthLong)
                 .SetAction("Action", (Android.Views.View.IOnClickListener)null).Show();
         }
 
@@ -208,7 +210,7 @@ namespace EyesonApp
                 System.Console.WriteLine("HCNetSDK init is failed");
                 return false;
             }
-            HCNetSDK.Instance.NET_DVR_SetLogToFile(3, "/mnt/sdcard/sdklog/", true);
+            var x = HCNetSDK.Instance.NET_DVR_SetLogToFile(3, "/mnt/sdcard/sdklog/", true);
             return true;
         }
 
@@ -241,8 +243,10 @@ namespace EyesonApp
         {
             if (!m_bSaveRealData)
             {
+                //
                 // Documents folder
-                string documentsPath = System.Environment.GetFolderPath( System.Environment.SpecialFolder.MyVideos) + "/test.mp4";
+                //string documentsPath = System.Environment.GetFolderPath( System.Environment.SpecialFolder.MyVideos) + "/test.mp4";
+                string documentsPath = "/mnt/sdcard/sdklog/"+ "test.mp4";
                 if (!HCNetSDK.Instance.NET_DVR_SaveRealData(m_iPlayID, documentsPath))
                 {
                     Console.WriteLine("NET_DVR_SaveRealData failed! error: " + HCNetSDK.Instance.NET_DVR_GetLastError());
@@ -269,20 +273,25 @@ namespace EyesonApp
                 m_bSaveRealData = false;
             }
         }
-
-        private void M_oCam_TextChanged(object sender, Android.Text.TextChangedEventArgs e)
-        {
-
-        }
-
+    
         private void M_oTime_FocusChange(object sender, View.FocusChangeEventArgs e)
         {
-            ShowDialog(998);
+            CanShowDateDialog = false;
+            if (!CanShowDateDialog)
+            {
+                ShowDialog(998);
+            }
+            CanShowDateDialog = true;
         }
 
         private void M_oDate_FocusChange(object sender, View.FocusChangeEventArgs e)
         {
-            ShowDialog(999);
+            CanShowDateDialog = true;
+            if (CanShowDateDialog)
+            {
+                ShowDialog(999);
+            }
+            CanShowDateDialog = false;
         }
 
         protected override Dialog OnCreateDialog(int id)
@@ -331,11 +340,120 @@ namespace EyesonApp
             m_oLoginBtn.Click += Login_Listener;
             m_oPreviewBtn.Click += Preview_Listener;
             m_oRecordBtn.Click += M_oRecordBtn_Click;
+            m_oPlaybackBtn.Click += M_oPlaybackBtn_Click;
 
             m_oDate.FocusChange += M_oDate_FocusChange;
             m_oTime.FocusChange += M_oTime_FocusChange;
 
             m_oCam.AddTextChangedListener(this);
+        }
+
+        private void M_oPlaybackBtn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (m_iLogID < 0)
+                {
+                    Log.Error("EYESON APP", "please login on a device first");
+                    Toast.MakeText(ApplicationContext, "please login on a device first", ToastLength.Long).Show();
+                    return;
+                }
+                if (m_iPlaybackID < 0)
+                {
+                    if (m_iPlayID >= 0)
+                    {
+                        Log.Info("EYESON APP", "Please stop preview first");
+                        Toast.MakeText(ApplicationContext, "Please stop preview first", ToastLength.Long).Show();
+                        return;
+                    }
+
+                    ChangeSingleSurFace(true);
+
+                    NET_DVR_TIME struBegin = new NET_DVR_TIME();
+                    NET_DVR_TIME struEnd = new NET_DVR_TIME();
+
+                    struBegin.DwYear = Year;
+                    struBegin.DwMonth = Month;
+                    struBegin.DwDay = Day;
+                    struBegin.DwHour = Hour;
+                    struBegin.DwMinute = Minute;
+                    struBegin.DwSecond = 00;
+
+                    struEnd.DwYear = 2019;
+                    struEnd.DwMonth = 4;
+                    struEnd.DwDay = 26;
+                    struEnd.DwHour = 10;
+                    struEnd.DwMinute = 48;
+                    struEnd.DwSecond = 20;
+
+                    NET_DVR_VOD_PARA struVod = new NET_DVR_VOD_PARA();
+                    struVod.StruBeginTime = struBegin;
+                    struVod.StruEndTime = struEnd;
+                    struVod.ByStreamType = 0;
+                    struVod.StruIDInfo.DwChannel = m_iStartChan == 0 ? Integer.ParseInt(m_oCam.Text.ToString()) - 1 : Integer.ParseInt(m_oCam.Text.ToString()) - 1;// getM_iStartChan(); //m_iStartChan;
+                    struVod.HWnd = playView[0].Holder.Surface;
+
+                    m_iPlaybackID = HCNetSDK.Instance.NET_DVR_PlayBackByTime_V40(m_iLogID, struVod);
+
+                    if (m_iPlaybackID >= 0)
+                    {
+                        NET_DVR_PLAYBACK_INFO struPlaybackInfo = null;
+                        if (!HCNetSDK.Instance.NET_DVR_PlayBackControl_V40(m_iPlaybackID, PlaybackControlCommand.NetDvrPlaystart, null, 0, struPlaybackInfo))
+                        {
+                            Log.Error("EYESON APP", "net sdk playback start failed!");
+                            return;
+                        }
+                        m_bStopPlayback = false;
+                        m_oPlaybackBtn.Text = "Stop";
+
+                        new System.Threading.Thread(new ThreadStart(() =>
+                        {
+                            int nProgress = -1;
+                            while (true)
+                            {
+                                nProgress = HCNetSDK.Instance.NET_DVR_GetPlayBackPos(m_iPlaybackID);
+
+                                System.Console.WriteLine("NET_DVR_GetPlayBackPos:" + nProgress);
+
+                                if (nProgress < 0 || nProgress >= 100)
+                                {
+                                    break;
+                                }
+
+                                try
+                                {
+                                    System.Threading.Thread.Sleep(1000);
+                                }
+                                catch (InterruptedException er)
+                                {
+                                    // TODO Auto-generated catch block
+                                    er.PrintStackTrace();
+                                }
+                            }
+                        })).Start();
+                    }
+                    else
+                    {
+                        Log.Info("EYESON APP", "NET_DVR_PlayBackByTime failed, error code: " + HCNetSDK.Instance.NET_DVR_GetLastError());
+                    }
+                }
+                else
+                {
+                    m_bStopPlayback = true;
+                    if (!HCNetSDK.Instance.NET_DVR_StopPlayBack(m_iPlaybackID))
+                    {
+                        Log.Error("EYESON APP", "net sdk stop playback failed");
+                    }
+                    m_oPlaybackBtn.Text = "Playback";
+                    m_iPlaybackID = -1;
+
+                    ChangeSingleSurFace(false);
+                }
+            }
+            catch (System.Exception er)
+            {
+                Log.Error("EYESON APP", "Error: " + er.StackTrace);           
+            }
         }
 
         private void Preview_Listener(object sender, EventArgs e)
@@ -344,6 +462,9 @@ namespace EyesonApp
             {
                 try
                 {
+                    InputMethodManager inputManager = (InputMethodManager)this.GetSystemService(Context.InputMethodService);
+                    inputManager.HideSoftInputFromWindow(this.CurrentFocus.WindowToken, HideSoftInputFlags.NotAlways);
+
                     if (m_iLogID < 0)
                     {
                         Log.Error("", "Please login in device first");
@@ -365,13 +486,26 @@ namespace EyesonApp
                                 await StartMultiplePreview(4);
 
                                 m_bMultiPlay = true;
-                                m_oPreviewBtn.Text = "Stop";
+
+                                using (var h = new Handler(Looper.MainLooper))
+                                {
+                                    h.Post(()=>
+                                    {
+                                        m_oPreviewBtn.Text = "Stop";
+                                    });
+                                }
                             }
                             else
                             {
                                 StopmultiPreview();
                                 m_bMultiPlay = false;
-                                m_oPreviewBtn.Text = "Preview";
+                                using (var h = new Handler(Looper.MainLooper))
+                                {
+                                    h.Post(() =>
+                                    {
+                                        m_oPreviewBtn.Text = "Preview";
+                                    });
+                                }
                             }
                         }
                         else
@@ -383,7 +517,14 @@ namespace EyesonApp
                             else
                             {
                                 StopSinglePreview();
-                                m_oPreviewBtn.Text = "Preview";
+
+                                using (var h = new Handler(Looper.MainLooper))
+                                {
+                                    h.Post(() =>
+                                    {
+                                        m_oPreviewBtn.Text = "Preview";
+                                    });
+                                }
                             }
                         }
                     }
