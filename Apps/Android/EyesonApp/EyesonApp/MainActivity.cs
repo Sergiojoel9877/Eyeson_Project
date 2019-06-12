@@ -174,9 +174,7 @@ namespace EyesonApp
 
         private void FabOnClick(object sender, EventArgs eventArgs)
         {
-            View view = (View)sender;
-            Snackbar.Make(view, "Eyeson App Beta 1.0.0", Snackbar.LengthLong)
-                .SetAction("Action", (Android.Views.View.IOnClickListener)null).Show();
+            ShowFancyMessage(this, "Eyeson App Beta 1.0.0", Position: CookieBar.Bottom, Color:Resource.Color.material_blue_grey_800);
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -190,6 +188,7 @@ namespace EyesonApp
             int id = item.ItemId;
             if (id == Resource.Id.action_settings)
             {
+                ShowFancyMessage(this, "Compatible With", Position: CookieBar.Bottom, Color: Resource.Color.material_blue_grey_800);
                 return true;
             }
 
@@ -584,11 +583,13 @@ namespace EyesonApp
             }
         }
 
-        private void ShowFancyMessage(Activity Activity, string Title, bool SwipeToDismissEnabled = true, int Position = CookieBar.Top, int Color = Resource.Color.material_blue_grey_900, int Duration = 1000)
+        private void ShowFancyMessage(Activity Activity, string Title, bool SwipeToDismissEnabled = true, string message = "", int Position = CookieBar.Top, int Color = Resource.Color.material_blue_grey_900, int Duration = 1000)
         {
             CookieBar.Build(Activity).SetTitle(Title)
                 .SetSwipeToDismiss(SwipeToDismissEnabled)
                 .SetCookiePosition(Position)
+                .SetMessage(message)
+                //.SetIcon()
                 .SetBackgroundColor(Color)
                 .SetDuration(Duration)
                 .Show();
