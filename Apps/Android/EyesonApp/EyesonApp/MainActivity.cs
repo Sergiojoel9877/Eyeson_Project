@@ -483,7 +483,7 @@ namespace EyesonApp
                             //CAMERA INDEX
                             if (!m_bMultiPlay)
                             {
-                                await StartMultiplePreview(4);
+                                StartMultiplePreview(4);
 
                                 m_bMultiPlay = true;
 
@@ -512,7 +512,7 @@ namespace EyesonApp
                         {
                             if (m_iPlayID < 0)
                             {
-                                await StartSinglePreview();
+                                StartSinglePreview();
                             }
                             else
                             {
@@ -594,12 +594,12 @@ namespace EyesonApp
             m_iPlayID = -1;
         }
 
-        private Task StartSinglePreview()
+        private void StartSinglePreview()
         {
             if (m_iPlaybackID >= 0)
             {
                 Log.Info("", "Please stop plaback first");
-                return Task.CompletedTask;
+                return;
             }
 
             Log.Info("", "m_iStartChan: " + m_iStartChan);
@@ -616,13 +616,11 @@ namespace EyesonApp
             if (m_iPlaybackID < 0)
             {
                 Log.Error("", "NET_DVR_RealPlay is failed!Err: " + HCNetSDK.Instance.NET_DVR_GetLastError());
-                return Task.CompletedTask;
+                return;
             }
 
             Log.Info("", "NetSdk Play sucess ***********************3***************************");
             m_oPreviewBtn.Text = "Stop";
-
-            return Task.CompletedTask;
         }
 
         private void StopmultiPreview()
@@ -634,7 +632,7 @@ namespace EyesonApp
             m_iPlayID = -1;
         }
 
-        private Task StartMultiplePreview(int index)
+        private void StartMultiplePreview(int index)
         {
             for (int i = 0; i < index; i++)
             {
@@ -642,8 +640,6 @@ namespace EyesonApp
             }
 
             m_iPlayID = playView[0].M_iPreviewHandle;
-
-            return Task.CompletedTask;
         }
         private int LoginDevice()
         {
