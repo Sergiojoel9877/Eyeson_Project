@@ -22,6 +22,7 @@ using EyesonApp.Controls;
 using EyesonApp.Services;
 using Java.Lang;
 using Java.Util;
+using Org.Aviran.Cookiebar2;
 using Org.MediaPlayer.PlayM4;
 
 namespace EyesonApp
@@ -355,7 +356,7 @@ namespace EyesonApp
                 if (m_iLogID < 0)
                 {
                     Log.Error("EYESON APP", "please login on a device first");
-                    Toast.MakeText(ApplicationContext, "please login on a device first", ToastLength.Long).Show();
+                    ShowFancyMessage(this, "Please login first", Color: Resource.Color.error_color_material);
                     return;
                 }
                 if (m_iPlaybackID < 0)
@@ -363,7 +364,7 @@ namespace EyesonApp
                     if (m_iPlayID >= 0)
                     {
                         Log.Info("EYESON APP", "Please stop preview first");
-                        Toast.MakeText(ApplicationContext, "Please stop preview first", ToastLength.Long).Show();
+                        ShowFancyMessage(this, "Please stop Preview function first", Color: Resource.Color.error_color_material);
                         return;
                     }
 
@@ -401,6 +402,7 @@ namespace EyesonApp
                         if (!HCNetSDK.Instance.NET_DVR_PlayBackControl_V40(m_iPlaybackID, PlaybackControlCommand.NetDvrPlaystart, null, 0, struPlaybackInfo))
                         {
                             Log.Error("EYESON APP", "net sdk playback start failed!");
+                            ShowFancyMessage(this, "NET_SDK_Playback start failed, try again.");
                             return;
                         }
                         m_bStopPlayback = false;
@@ -435,6 +437,7 @@ namespace EyesonApp
                     else
                     {
                         Log.Info("EYESON APP", "NET_DVR_PlayBackByTime failed, error code: " + HCNetSDK.Instance.NET_DVR_GetLastError());
+                        ShowFancyMessage(this, "NET_DVR_PlayBackByTime failed, error code: " + HCNetSDK.Instance.NET_DVR_GetLastError());
                     }
                 }
                 else
@@ -443,6 +446,7 @@ namespace EyesonApp
                     if (!HCNetSDK.Instance.NET_DVR_StopPlayBack(m_iPlaybackID))
                     {
                         Log.Error("EYESON APP", "net sdk stop playback failed");
+                        ShowFancyMessage(this, "NET_SDK_Playback failed", Duration: 1500);
                     }
                     m_oPlaybackBtn.Text = "Playback";
                     m_iPlaybackID = -1;
@@ -468,6 +472,7 @@ namespace EyesonApp
                     if (m_iLogID < 0)
                     {
                         Log.Error("", "Please login in device first");
+                        ShowFancyMessage(this, "Please log in first", Color: Resource.Color.error_color_material);
                         return;
                     }
                     if (m_iPlaybackID >= 0)
@@ -547,6 +552,7 @@ namespace EyesonApp
                     if (m_iLogID < 0)
                     {
                         Console.WriteLine("This device logins failed!");
+                        ShowFancyMessage(this, "Login failed, try again");
                         return;
                     }
                     else
@@ -555,14 +561,17 @@ namespace EyesonApp
                     }
 
                     m_oLoginBtn.Text = "Logout";
+
                     Log.Info("", "Login sucess ****************************1***************************");
 
+                    ShowFancyMessage(this, "Logged in successfully");
                 }
                 else
                 {
                     if (!HCNetSDK.Instance.NET_DVR_Logout_V30(m_iLogID))
                     {
                         Log.Error("", "NET_DVR_Logout is failed!");
+                        ShowFancyMessage(this, "NET_DVR_Logout is failed");
                         return;
                     }
                     m_oLoginBtn.Text = "Login";
@@ -573,6 +582,16 @@ namespace EyesonApp
             {
                 Log.Error("", "error: " + er.ToString());
             }
+        }
+
+        private void ShowFancyMessage(Activity Activity, string Title, bool SwipeToDismissEnabled = true, int Position = CookieBar.Top, int Color = Resource.Color.material_blue_grey_900, int Duration = 1000)
+        {
+            CookieBar.Build(Activity).SetTitle(Title)
+                .SetSwipeToDismiss(SwipeToDismissEnabled)
+                .SetCookiePosition(Position)
+                .SetBackgroundColor(Color)
+                .SetDuration(Duration)
+                .Show();
         }
 
         private void StopSinglePreview()
@@ -588,6 +607,7 @@ namespace EyesonApp
             {
                 Log.Error("", "StopRealPlay is failed!Err:"
                         + HCNetSDK.Instance.NET_DVR_GetLastError());
+                ShowFancyMessage(this, "StopRealPlay failed", Duration: 1500);
                 return;
             }
 
@@ -599,6 +619,7 @@ namespace EyesonApp
             if (m_iPlaybackID >= 0)
             {
                 Log.Info("", "Please stop plaback first");
+                ShowFancyMessage(this, "Please stop playback first", Color: Resource.Color.error_color_material);
                 return;
             }
 

@@ -70,6 +70,9 @@
     <EnableLLVM>false</EnableLLVM>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CookieBar2">
+      <HintPath>..\..\..\..\Bindings\Android\CookieBar2\CookieBar2\bin\Debug\CookieBar2.dll</HintPath>
+    </Reference>
     <Reference Include="HCNetSDK">
       <HintPath>..\..\..\..\Bindings\Android\HCNetSDK\HCNetSDK\bin\Debug\HCNetSDK.dll</HintPath>
     </Reference>
