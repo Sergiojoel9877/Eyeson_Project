@@ -199,7 +199,7 @@ namespace EyesonApp
             int id = item.ItemId;
             if (id == Resource.Id.action_settings)
             {
-                ShowFancyMessage(this, "Compatible With", Position: CookieBar.Bottom, Color: Resource.Color.material_blue_grey_800);
+                ShowFancyMessage(this, "Compatible With", message: "HikVision SDK", Position: CookieBar.Bottom, Color: Resource.Color.material_blue_grey_800, Duration: 3500);
                 return true;
             }
 
@@ -248,7 +248,6 @@ namespace EyesonApp
             m_oDate = (EditText)FindViewById(Resource.Id.EDT_Date);
             m_oTime = (EditText)FindViewById(Resource.Id.EDT_Hr);
             m_IPAdrs = (TextView)FindViewById(Resource.Id.ipPlaceHolder);
-          
         }
 
         private void Record_Listener(object sender, EventArgs e)
@@ -259,20 +258,19 @@ namespace EyesonApp
             {
                 //
                 // Documents folder
-                //string documentsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.) + $"_{random.Next(12000)}.mp4";
-                string documentsPath = this.GetExternalFilesDir($"_{random.Next(12000)}").AbsolutePath;
+                string documentsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyVideos) + $"_{random.Next(12000)}.mp4";
+                //string documentsPath = this.GetExternalFilesDir($"_{random.Next(12000)}").AbsolutePath;
                 //string documentsPath = $"/storage/emulated/0/" + $"_{random.Next()}.mp4";
                 if (!HCNetSDK.Instance.NET_DVR_SaveRealData(m_iPlayID, documentsPath))
                 {
                     Console.WriteLine("NET_DVR_SaveRealData failed! error: " + HCNetSDK.Instance.NET_DVR_GetLastError());
-                    ShowFancyMessage(this, $"There's an error: Code: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to start saving the video", Position:CookieBar.Top, Color:Resource.Color.error_color_material, Duration: 23000);
+                    ShowFancyMessage(this, $"There's an error: Code: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to start saving the video", Position:CookieBar.Top, Color:Resource.Color.error_color_material_light, Duration: 23000);
                     return;
                 }
                 else
                 {
                     Console.WriteLine("NET_DVR_SaveRealData success!");
                     ShowFancyMessage(this, "Saving data in realtime", SwipeToDismissEnabled: true, Position: CookieBar.Top, Duration: 2000);
-
                 }
                 m_bSaveRealData = true;
             }
@@ -283,7 +281,7 @@ namespace EyesonApp
                     Console.WriteLine("NET_DVR_StopSaveRealData failed! error: "
                                     + HCNetSDK.Instance
                                             .NET_DVR_GetLastError());
-                    ShowFancyMessage(this, $"There's an error at: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to stop saving the video", Position: CookieBar.Top, Color: Resource.Color.error_color_material, Duration: 23000);
+                    ShowFancyMessage(this, $"There's an error at: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to stop saving the video", Position: CookieBar.Top, Color: Resource.Color.error_color_material_light, Duration: 23000);
 
                 }
                 else
@@ -375,7 +373,7 @@ namespace EyesonApp
                 if (m_iLogID < 0)
                 {
                     Log.Error("EYESON APP", "please login on a device first");
-                    ShowFancyMessage(this, "Please login first", Color: Resource.Color.error_color_material);
+                    ShowFancyMessage(this, "Please login first", Color: Resource.Color.error_color_material_light);
                     return;
                 }
                 if (m_iPlaybackID < 0)
@@ -383,7 +381,7 @@ namespace EyesonApp
                     if (m_iPlayID >= 0)
                     {
                         Log.Info("EYESON APP", "Please stop preview first");
-                        ShowFancyMessage(this, "Please stop Preview function first", Color: Resource.Color.error_color_material);
+                        ShowFancyMessage(this, "Please stop Preview function first", Color: Resource.Color.error_color_material_light);
                         return;
                     }
 
@@ -458,7 +456,7 @@ namespace EyesonApp
                         Log.Info("EYESON APP", "NET_DVR_PlayBackByTime failed, error code: " + HCNetSDK.Instance.NET_DVR_GetLastError());
                         var code = HCNetSDK.Instance.NET_DVR_GetLastError();
                         var msg = code == 10 ? "Connection Time out, try again" : "";
-                        ShowFancyMessage(this, "NET_DVR_PlayBackByTime failed, error code: " + code, message: msg, Color:Resource.Color.error_color_material, Duration:3000);
+                        ShowFancyMessage(this, "NET_DVR_PlayBackByTime failed, error code: " + code, message: msg, Color:Resource.Color.error_color_material_light, Duration:3000);
                     }
                 }
                 else
@@ -467,7 +465,7 @@ namespace EyesonApp
                     if (!HCNetSDK.Instance.NET_DVR_StopPlayBack(m_iPlaybackID))
                     {
                         Log.Error("EYESON APP", "net sdk stop playback failed");
-                        ShowFancyMessage(this, "NET_SDK_Playback failed", Color:Resource.Color.error_color_material, Duration: 23000);
+                        ShowFancyMessage(this, "NET_SDK_Playback failed", Color:Resource.Color.error_color_material_light, Duration: 23000);
                     }
                     m_oPlaybackBtn.Text = "Playback";
                     m_iPlaybackID = -1;
@@ -476,7 +474,7 @@ namespace EyesonApp
             catch (System.Exception er)
             {
                 Log.Error("EYESON APP", "Error: " + er.StackTrace);
-                ShowFancyMessage(this, "Please login first", message: "Fatal error: " + er.StackTrace, Color: Resource.Color.error_color_material);
+                ShowFancyMessage(this, "Please login first", message: "Fatal error: " + er.StackTrace, Color: Resource.Color.error_color_material_light);
             }
         }
 
@@ -502,13 +500,13 @@ namespace EyesonApp
                     if (m_iLogID < 0)
                     {
                         Log.Error("", "Please login in device first");
-                        ShowFancyMessage(this, "Please log in first", Color: Resource.Color.error_color_material);
+                        ShowFancyMessage(this, "Please log in first", Color: Resource.Color.error_color_material_light);
                         return;
                     }
                     if (m_iPlaybackID >= 0)
                     {
                         Log.Info("", "Please stop palyback first");
-                        ShowFancyMessage(this, "Please stop playback first", Color: Resource.Color.error_color_material, Duration: 23000);
+                        ShowFancyMessage(this, "Please stop playback first", Color: Resource.Color.error_color_material_light, Duration: 23000);
                         return;
                     }
 
@@ -583,7 +581,7 @@ namespace EyesonApp
                     if (m_iLogID < 0)
                     {
                         Console.WriteLine("This device logins failed!");
-                        ShowFancyMessage(this, "Login failed, try again", Position:CookieBar.Top, Color:Resource.Color.error_color_material);
+                        ShowFancyMessage(this, "Login failed, try again", Position:CookieBar.Top, Color:Resource.Color.error_color_material_light);
                         return;
                     }
                     else
@@ -640,7 +638,7 @@ namespace EyesonApp
             {
                 Log.Error("", "StopRealPlay is failed!Err:"
                         + HCNetSDK.Instance.NET_DVR_GetLastError());
-                ShowFancyMessage(this, "StopRealPlay failed", Color:Resource.Color.error_color_material, Duration: 23000);
+                ShowFancyMessage(this, "StopRealPlay failed", Color:Resource.Color.error_color_material_light, Duration: 23000);
                 return;
             }
 
@@ -652,7 +650,7 @@ namespace EyesonApp
             if (m_iPlaybackID >= 0)
             {
                 Log.Info("", "Please stop plaback first");
-                ShowFancyMessage(this, "Please stop playback first", Color: Resource.Color.error_color_material);
+                ShowFancyMessage(this, "Please stop playback first", Color: Resource.Color.error_color_material_light);
                 return;
             }
 
@@ -709,7 +707,10 @@ namespace EyesonApp
 
         private int LoginNormalDevice()
         {
-            m_oNetDvrDeviceInfoV30 = new NET_DVR_DEVICEINFO_V30();
+            m_oNetDvrDeviceInfoV30 = new NET_DVR_DEVICEINFO_V30
+            {
+                ByAlarmInPortNum = default
+            };
 
             if (null == m_oNetDvrDeviceInfoV30)
             {
