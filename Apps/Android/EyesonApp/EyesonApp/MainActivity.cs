@@ -124,6 +124,12 @@ namespace EyesonApp
             new System.Threading.Thread(new ThreadStart(() => {
                 AsynchronousSocketListener.StartListening();
             })).Start();
+
+            Xamarin.Essentials.Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
+        }
+
+        private void Connectivity_ConnectivityChanged(object sender, Xamarin.Essentials.ConnectivityChangedEventArgs e)
+        {
         }
 
         private void SetIPAddressToIPLabel()
@@ -399,7 +405,7 @@ namespace EyesonApp
 
                     struEnd.DwYear = System.DateTime.UtcNow.Year;
                     struEnd.DwMonth = System.DateTime.UtcNow.Month;
-                    struEnd.DwDay = System.DateTime.UtcNow.Day - 1;
+                    struEnd.DwDay = System.DateTime.UtcNow.Day;
                     struEnd.DwHour = System.DateTime.Now.Hour;
                     struEnd.DwMinute = System.DateTime.UtcNow.Minute;
                     struEnd.DwSecond = System.DateTime.UtcNow.Second;
