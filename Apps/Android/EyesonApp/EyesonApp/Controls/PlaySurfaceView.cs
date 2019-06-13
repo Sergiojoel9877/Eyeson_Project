@@ -97,6 +97,13 @@ namespace EyesonApp.Controls
             if (M_iPreviewHandle < 0)
             {
                 Console.WriteLine(TAG, "NET_DVR_RealPlay is failed!Err: " + HCNetSDK.Instance.NET_DVR_GetLastError());
+                using (var h = new Handler(Looper.MainLooper))
+                {
+                    h.Post(()=>
+                    {
+                        MainActivity.ShowFancyMessage(MainActivity.GetApplicationContext(), "Preview has failed", message: $"Error code: {HCNetSDK.Instance.NET_DVR_GetLastError()} ");
+                    });
+                }
                 MainActivity.ShowFancyMessage(MainActivity.GetApplicationContext(), "Preview has failed", message:$"Error code: {HCNetSDK.Instance.NET_DVR_GetLastError()} ");
             }
         }
