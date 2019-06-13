@@ -208,6 +208,7 @@ namespace EyesonApp
             if (!HCNetSDK.Instance.NET_DVR_Init())
             {
                 System.Console.WriteLine("HCNetSDK init is failed");
+                ShowFancyMessage(this, "The HCNetSDK has failed to init", Position:CookieBar.Top, Color: Resource.Color.material_blue_grey_800, Duration:1500);
                 return false;
             }
             var x = HCNetSDK.Instance.NET_DVR_SetLogToFile(3, "/mnt/sdcard/sdklog/", true);
@@ -246,10 +247,11 @@ namespace EyesonApp
                 //
                 // Documents folder
                 //string documentsPath = System.Environment.GetFolderPath( System.Environment.SpecialFolder.MyVideos) + "/test.mp4";
-                string documentsPath = "/mnt/sdcard/sdklog/"+ "test.mp4";
+                string documentsPath = "/mnt/sdcard/sdklog/"+ "_1.mp4";
                 if (!HCNetSDK.Instance.NET_DVR_SaveRealData(m_iPlayID, documentsPath))
                 {
                     Console.WriteLine("NET_DVR_SaveRealData failed! error: " + HCNetSDK.Instance.NET_DVR_GetLastError());
+                    ShowFancyMessage(this, $"There's an error at: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to start saving the video", Position:CookieBar.Top, Color:Resource.Color.error_color_material, Duration: 1500);
                     return;
                 }
                 else
@@ -265,6 +267,8 @@ namespace EyesonApp
                     Console.WriteLine("NET_DVR_StopSaveRealData failed! error: "
                                     + HCNetSDK.Instance
                                             .NET_DVR_GetLastError());
+                    ShowFancyMessage(this, $"There's an error at: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to stop saving the video", Position: CookieBar.Top, Color: Resource.Color.error_color_material, Duration: 1500);
+
                 }
                 else
                 {
@@ -445,7 +449,7 @@ namespace EyesonApp
                     if (!HCNetSDK.Instance.NET_DVR_StopPlayBack(m_iPlaybackID))
                     {
                         Log.Error("EYESON APP", "net sdk stop playback failed");
-                        ShowFancyMessage(this, "NET_SDK_Playback failed", Duration: 1500);
+                        ShowFancyMessage(this, "NET_SDK_Playback failed", Color:Resource.Color.error_color_material, Duration: 1500);
                     }
                     m_oPlaybackBtn.Text = "Playback";
                     m_iPlaybackID = -1;
@@ -455,7 +459,8 @@ namespace EyesonApp
             }
             catch (System.Exception er)
             {
-                Log.Error("EYESON APP", "Error: " + er.StackTrace);           
+                Log.Error("EYESON APP", "Error: " + er.StackTrace);
+                ShowFancyMessage(this, "Please login first", message: "Fatal error: " + er.StackTrace, Color: Resource.Color.error_color_material);
             }
         }
 
@@ -477,6 +482,7 @@ namespace EyesonApp
                     if (m_iPlaybackID >= 0)
                     {
                         Log.Info("", "Please stop palyback first");
+                        ShowFancyMessage(this, "Please stop playback first", Color: Resource.Color.error_color_material, Duration: 1500);
                         return;
                     }
 
@@ -551,7 +557,7 @@ namespace EyesonApp
                     if (m_iLogID < 0)
                     {
                         Console.WriteLine("This device logins failed!");
-                        ShowFancyMessage(this, "Login failed, try again");
+                        ShowFancyMessage(this, "Login failed, try again", Position:CookieBar.Top, Color:Resource.Color.error_color_material);
                         return;
                     }
                     else
@@ -583,7 +589,7 @@ namespace EyesonApp
             }
         }
 
-        private void ShowFancyMessage(Activity Activity, string Title, bool SwipeToDismissEnabled = true, string message = "", int Position = CookieBar.Top, int Color = Resource.Color.material_blue_grey_900, int Duration = 1000)
+        public static void ShowFancyMessage(Activity Activity, string Title, bool SwipeToDismissEnabled = true, string message = "", int Position = CookieBar.Top, int Color = Resource.Color.material_blue_grey_900, int Duration = 1000)
         {
             CookieBar.Build(Activity).SetTitle(Title)
                 .SetSwipeToDismiss(SwipeToDismissEnabled)
@@ -608,7 +614,7 @@ namespace EyesonApp
             {
                 Log.Error("", "StopRealPlay is failed!Err:"
                         + HCNetSDK.Instance.NET_DVR_GetLastError());
-                ShowFancyMessage(this, "StopRealPlay failed", Duration: 1500);
+                ShowFancyMessage(this, "StopRealPlay failed", Color:Resource.Color.error_color_material, Duration: 1500);
                 return;
             }
 
