@@ -8,7 +8,7 @@
 
     <ScrollView
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -70,7 +70,7 @@
                 android:id="@+id/Sur_Player"
                 android:layout_width="424dp"
                 android:layout_height="280dp"
-                android:layout_marginTop="80dp"
+                android:layout_marginTop="0dp"
                 android:background="#0000ff00"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -112,37 +112,40 @@
 
             <Button
                 android:id="@+id/btn_Login"
+                android:background="@mipmap/buttons_cornerRadius"
                 android:layout_width="107dp"
                 android:layout_height="46dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:text="Login"
-                android:textColor="#ff000000"
+                android:textColor="#fff"
                 android:typeface="sans"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/EDT_Cam" />
 
             <Button
                 android:id="@+id/btn_Preview"
+                android:background="@mipmap/buttons_cornerRadius"
                 android:layout_width="107dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="80dp"
                 android:text="Preview"
-                android:textColor="#ff000000"
+                android:textColor="#fff"
                 android:typeface="sans"
                 app:layout_constraintStart_toEndOf="@+id/btn_Login"
                 app:layout_constraintTop_toBottomOf="@+id/EDT_Hr" />
 
             <Button
                 android:id="@+id/btn_Playback"
+                android:background="@mipmap/buttons_cornerRadius"
                 android:layout_width="107dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="80dp"
                 android:layout_marginEnd="16dp"
                 android:text="Playback"
-                android:textColor="#ff000000"
+                android:textColor="#fff"
                 android:typeface="sans"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.125"
@@ -151,9 +154,11 @@
 
             <Button
                 android:id="@+id/btn_Capture"
+                android:background="@mipmap/buttons_cornerRadius"
                 android:layout_width="107dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
+                android:textColor="#fff"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="8dp"
                 android:text="Capture"
@@ -164,10 +169,12 @@
 
             <Button
                 android:id="@+id/btn_Record"
+                android:background="@mipmap/buttons_cornerRadius"
                 android:layout_width="108dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="9dp"
+                android:textColor="#fff"
                 android:text="Record"
                 app:layout_constraintStart_toEndOf="@+id/btn_Capture"
                 app:layout_constraintTop_toBottomOf="@+id/btn_Preview" />

@@ -228,7 +228,7 @@ namespace EyesonApp
                 ShowFancyMessage(this, "The HCNetSDK has failed to init", Position:CookieBar.Top, Color: Resource.Color.material_blue_grey_800, Duration:1500);
                 return false;
             }
-            var x = HCNetSDK.Instance.NET_DVR_SetLogToFile(3, "/mnt/sdcard/sdklog/", true);
+            HCNetSDK.Instance.NET_DVR_SetLogToFile(3, "/mnt/sdcard/sdklog/", true);
             return true;
         }
 
@@ -293,6 +293,7 @@ namespace EyesonApp
                 else
                 {
                     Console.WriteLine("NET_DVR_SaveRealData success!");
+                    ShowFancyMessage(this, "Realtime data saved.", SwipeToDismissEnabled: true, Position: CookieBar.Top, Duration: 2000);
                 }
                 m_bSaveRealData = false;
             }
