@@ -20,14 +20,18 @@ using Android.Widget;
 using Com.Hikvision.Netsdk;
 using EyesonApp.Controls;
 using EyesonApp.Services;
+using Java.IO;
 using Java.Lang;
 using Java.Util;
 using Org.Aviran.Cookiebar2;
 using Org.MediaPlayer.PlayM4;
+using Xamarin.Essentials;
+using AlertDialog = Android.Support.V7.App.AlertDialog;
+using Console = System.Console;
 
 namespace EyesonApp.Activities
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/ThemeSplash", MainLauncher = true)]
     public class MainActivity : AppCompatActivity, IExceptionCallBack, ITextWatcher
     {
         private static Button m_oLoginBtn = null;
@@ -85,9 +89,11 @@ namespace EyesonApp.Activities
         {
             base.OnCreate(savedInstanceState);
 
-            LayoutInflater inflater = LayoutInflater.From(this);
-            View main = inflater.Inflate(Resource.Layout.activity_main, null);
-            SetContentView(main);
+            base.Window.RequestFeature(Android.Views.WindowFeatures.ActionBar);
+
+            base.SetTheme(Resource.Style.AppTheme_NoActionBar);
+
+            SetContentView(Resource.Layout.activity_main);
 
             Android.Support.V7.Widget.Toolbar toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
@@ -110,6 +116,15 @@ namespace EyesonApp.Activities
             SetIPAddressToIPLabel();
 
             SetGlobalAppContext();
+
+            ShowAlertAboutApp();
+        }
+
+        private void ShowAlertAboutApp()
+        {
+            var alert = new AlertDialog.Builder(GetApplicationContext()).SetTitle("Eyeson APP BETA Phase 0")
+                .SetMessage("This is the preview of the Phase 0, some details are waiting to be treated, those will get fixed, patched and/or refactored completely [Like the UI/UX, when more phases of the app get finished] on future updates, thanks. Sergio Joel Ferreras Batista | Mobile Developer, Eyeson Digital LLC.").SetPositiveButton("Yes", (a, s) => { }).SetIcon(Resource.Drawable.notification_bg);
+            alert.Show();
         }
 
         private void SetGlobalAppContext()
@@ -366,11 +381,60 @@ namespace EyesonApp.Activities
             m_oPreviewBtn.Click += Preview_Listener;
             m_oRecordBtn.Click += Record_Listener;
             m_oPlaybackBtn.Click += M_oPlaybackBtn_Click;
+            m_oCaptureBtn.Click += Capture_Listener;
 
             m_oDate.FocusChange += M_oDate_FocusChange;
             m_oTime.FocusChange += M_oTime_FocusChange;
 
             m_oCam.AddTextChangedListener(this);
+        }
+
+        private void Capture_Listener(object sender, EventArgs e)
+        {
+            try
+            {
+                var port = Player.Instance.Port;
+                if (/*m_iPort < 0*/ port < 0)
+                {
+                    Log.Error("EYESON APP", "please start preview first");
+                    ShowFancyMessage(this, "Please start previewing first", Color: Resource.Color.error_color_material_light, Duration: 2000);
+                    return;
+                }
+
+                Player.MPInteger stWidth = new Player.MPInteger();
+                Player.MPInteger stHeight = new Player.MPInteger();
+
+                if (!Player.Instance.GetPictureSize(port, stWidth, stHeight))
+                {
+                    Log.Error("EYESON", "please start preview first");
+                    ShowFancyMessage(this, "Please start previewing first", Color:Resource.Color.error_color_material_light, Duration:2000);
+                    return;
+                }
+
+                int nSize = 5 * stWidth.Value * stHeight.Value;
+                byte[] picBuf = new byte[nSize];
+
+                Player.MPInteger stSize = new Player.MPInteger();
+
+                if (!Player.Instance.GetBMP(port, picBuf, nSize, stSize))
+                {
+                    var error = Player.Instance.GetLastError(port);
+                    Log.Error("EYESON APP", $"getBMP failed with error code: {error}");
+                    ShowFancyMessage(this, $"Capturing function failed: {error}", Color: Resource.Color.error_color_material_light, Duration: 2000);
+                    return;
+                }
+                //var path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonPictures);
+                var path = FileSystem.AppDataDirectory;
+
+                FileOutputStream file = new FileOutputStream(path + System.DateTime.Now.Date + ".bmp");
+                file.Write(picBuf, 0, stSize.Value);
+                file.Close();
+
+            }   
+            catch (System.Exception er)
+            {
+                Log.Error("EYESON APP", "Error at: " + er.ToString());
+            }
         }
 
         private void M_oPlaybackBtn_Click(object sender, EventArgs e)
@@ -581,6 +645,11 @@ namespace EyesonApp.Activities
         {
             try
             {
+                if (m_oIPAddr.Text.Trim().Length == 0 || m_oPort.Text.Trim().Length == 0 || m_oUser.Text.Trim().Length == 0 || m_oPsd.Text.Trim().Length == 0)
+                {
+                    ShowFancyMessage(this, "Fill every field", Color:Resource.Color.error_color_material_light);
+                    return;
+                }
                 if (m_iLogID < 0)
                 {
                     //login in the device
