@@ -90,7 +90,7 @@
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainActivity.cs" />
+    <Compile Include="Activities\MainActivity.cs" />
     <Compile Include="Controls\PlaySurfaceView.cs" />
     <Compile Include="Models\Data.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
@@ -211,9 +211,7 @@
     </PackageReference>
     <PackageReference Include="Xamarin.Essentials" Version="1.0.1" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Activities\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <AndroidResource Include="Resources\mipmap-hdpi\image.png" />
   </ItemGroup>

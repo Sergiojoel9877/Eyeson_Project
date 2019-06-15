@@ -25,7 +25,7 @@ using Java.Util;
 using Org.Aviran.Cookiebar2;
 using Org.MediaPlayer.PlayM4;
 
-namespace EyesonApp
+namespace EyesonApp.Activities
 {
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
     public class MainActivity : AppCompatActivity, IExceptionCallBack, ITextWatcher

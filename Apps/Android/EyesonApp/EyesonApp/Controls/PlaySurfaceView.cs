@@ -12,6 +12,7 @@ using Android.Views;
 using Android.Widget;
 using Com.Hikvision.Netsdk;
 using EyesonApp;
+using EyesonApp.Activities;
 
 namespace EyesonApp.Controls
 {
