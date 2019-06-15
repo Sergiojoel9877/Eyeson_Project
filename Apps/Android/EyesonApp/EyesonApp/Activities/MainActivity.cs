@@ -20,13 +20,18 @@ using Android.Widget;
 using Com.Hikvision.Netsdk;
 using EyesonApp.Controls;
 using EyesonApp.Services;
+using Java.IO;
 using Java.Lang;
 using Java.Util;
+using Org.Aviran.Cookiebar2;
 using Org.MediaPlayer.PlayM4;
+using Xamarin.Essentials;
+using AlertDialog = Android.Support.V7.App.AlertDialog;
+using Console = System.Console;
 
-namespace EyesonApp
+namespace EyesonApp.Activities
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/ThemeSplash", MainLauncher = true)]
     public class MainActivity : AppCompatActivity, IExceptionCallBack, ITextWatcher
     {
         private static Button m_oLoginBtn = null;
@@ -50,6 +55,8 @@ namespace EyesonApp
         private static DatePicker datePicker;
         private Android.Icu.Util.Calendar calendar;
         private NET_DVR_DEVICEINFO_V30 m_oNetDvrDeviceInfoV30 = null;
+
+        public static MainActivity MContext { get; set; }
 
         private static int m_iLogID = -1; // return by NET_DVR_Login_v30
         private static int m_iPlayID = -1; // return by NET_DVR_RealPlay_V30
@@ -82,9 +89,11 @@ namespace EyesonApp
         {
             base.OnCreate(savedInstanceState);
 
-            LayoutInflater inflater = LayoutInflater.From(this);
-            View main = inflater.Inflate(Resource.Layout.activity_main, null);
-            SetContentView(main);
+            base.Window.RequestFeature(Android.Views.WindowFeatures.ActionBar);
+
+            base.SetTheme(Resource.Style.AppTheme_NoActionBar);
+
+            SetContentView(Resource.Layout.activity_main);
 
             Android.Support.V7.Widget.Toolbar toolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(toolbar);
@@ -105,13 +114,37 @@ namespace EyesonApp
             }
 
             SetIPAddressToIPLabel();
+
+            SetGlobalAppContext();
+
+            ShowAlertAboutApp();
         }
+
+        private void ShowAlertAboutApp()
+        {
+            var alert = new AlertDialog.Builder(GetApplicationContext()).SetTitle("Eyeson APP BETA Phase 0")
+                .SetMessage("This is the preview of the Phase 0, some details are waiting to be treated, those will get fixed, patched and/or refactored completely [Like the UI/UX, when more phases of the app get finished] on future updates, thanks. Sergio Joel Ferreras Batista | Mobile Developer, Eyeson Digital LLC.").SetPositiveButton("Yes", (a, s) => { }).SetIcon(Resource.Drawable.notification_bg);
+            alert.Show();
+        }
+
+        private void SetGlobalAppContext()
+        {
+            MainActivity.MContext = this;
+        }
+
+        public static Activity GetApplicationContext() => MainActivity.MContext;
 
         private void StartSocketListening()
         {
             new System.Threading.Thread(new ThreadStart(() => {
                 AsynchronousSocketListener.StartListening();
             })).Start();
+
+            Xamarin.Essentials.Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
+        }
+
+        private void Connectivity_ConnectivityChanged(object sender, Xamarin.Essentials.ConnectivityChangedEventArgs e)
+        {
         }
 
         private void SetIPAddressToIPLabel()
@@ -210,7 +243,7 @@ namespace EyesonApp
                 ShowFancyMessage(this, "The HCNetSDK has failed to init", Position:CookieBar.Top, Color: Resource.Color.material_blue_grey_800, Duration:1500);
                 return false;
             }
-            var x = HCNetSDK.Instance.NET_DVR_SetLogToFile(3, "/mnt/sdcard/sdklog/", true);
+            HCNetSDK.Instance.NET_DVR_SetLogToFile(3, "/mnt/sdcard/sdklog/", true);
             return true;
         }
 
@@ -238,8 +271,10 @@ namespace EyesonApp
             m_IPAdrs = (TextView)FindViewById(Resource.Id.ipPlaceHolder);
         }
 
-        private void M_oRecordBtn_Click(object sender, EventArgs e)
+        private void Record_Listener(object sender, EventArgs e)
         {
+            var random = new System.Random(12000);
+           
             if (!m_bSaveRealData)
             {
                 //
@@ -273,6 +308,7 @@ namespace EyesonApp
                 else
                 {
                     Console.WriteLine("NET_DVR_SaveRealData success!");
+                    ShowFancyMessage(this, "Realtime data saved.", SwipeToDismissEnabled: true, Position: CookieBar.Top, Duration: 2000);
                 }
                 m_bSaveRealData = false;
             }
@@ -345,11 +381,60 @@ namespace EyesonApp
             m_oPreviewBtn.Click += Preview_Listener;
             m_oRecordBtn.Click += Record_Listener;
             m_oPlaybackBtn.Click += M_oPlaybackBtn_Click;
+            m_oCaptureBtn.Click += Capture_Listener;
 
             m_oDate.FocusChange += M_oDate_FocusChange;
             m_oTime.FocusChange += M_oTime_FocusChange;
 
             m_oCam.AddTextChangedListener(this);
+        }
+
+        private void Capture_Listener(object sender, EventArgs e)
+        {
+            try
+            {
+                var port = Player.Instance.Port;
+                if (/*m_iPort < 0*/ port < 0)
+                {
+                    Log.Error("EYESON APP", "please start preview first");
+                    ShowFancyMessage(this, "Please start previewing first", Color: Resource.Color.error_color_material_light, Duration: 2000);
+                    return;
+                }
+
+                Player.MPInteger stWidth = new Player.MPInteger();
+                Player.MPInteger stHeight = new Player.MPInteger();
+
+                if (!Player.Instance.GetPictureSize(port, stWidth, stHeight))
+                {
+                    Log.Error("EYESON", "please start preview first");
+                    ShowFancyMessage(this, "Please start previewing first", Color:Resource.Color.error_color_material_light, Duration:2000);
+                    return;
+                }
+
+                int nSize = 5 * stWidth.Value * stHeight.Value;
+                byte[] picBuf = new byte[nSize];
+
+                Player.MPInteger stSize = new Player.MPInteger();
+
+                if (!Player.Instance.GetBMP(port, picBuf, nSize, stSize))
+                {
+                    var error = Player.Instance.GetLastError(port);
+                    Log.Error("EYESON APP", $"getBMP failed with error code: {error}");
+                    ShowFancyMessage(this, $"Capturing function failed: {error}", Color: Resource.Color.error_color_material_light, Duration: 2000);
+                    return;
+                }
+                //var path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonPictures);
+                var path = FileSystem.AppDataDirectory;
+
+                FileOutputStream file = new FileOutputStream(path + System.DateTime.Now.Date + ".bmp");
+                file.Write(picBuf, 0, stSize.Value);
+                file.Close();
+
+            }   
+            catch (System.Exception er)
+            {
+                Log.Error("EYESON APP", "Error at: " + er.ToString());
+            }
         }
 
         private void M_oPlaybackBtn_Click(object sender, EventArgs e)
@@ -385,7 +470,7 @@ namespace EyesonApp
 
                     struEnd.DwYear = System.DateTime.UtcNow.Year;
                     struEnd.DwMonth = System.DateTime.UtcNow.Month;
-                    struEnd.DwDay = System.DateTime.UtcNow.Day - 1;
+                    struEnd.DwDay = System.DateTime.UtcNow.Day;
                     struEnd.DwHour = System.DateTime.Now.Hour;
                     struEnd.DwMinute = System.DateTime.UtcNow.Minute;
                     struEnd.DwSecond = System.DateTime.UtcNow.Second;
@@ -560,6 +645,11 @@ namespace EyesonApp
         {
             try
             {
+                if (m_oIPAddr.Text.Trim().Length == 0 || m_oPort.Text.Trim().Length == 0 || m_oUser.Text.Trim().Length == 0 || m_oPsd.Text.Trim().Length == 0)
+                {
+                    ShowFancyMessage(this, "Fill every field", Color:Resource.Color.error_color_material_light);
+                    return;
+                }
                 if (m_iLogID < 0)
                 {
                     //login in the device
@@ -586,6 +676,7 @@ namespace EyesonApp
                     if (!HCNetSDK.Instance.NET_DVR_Logout_V30(m_iLogID))
                     {
                         Log.Error("", "NET_DVR_Logout is failed!");
+                        ShowFancyMessage(this, "NET_DVR_Logout is failed");
                         return;
                     }
                     m_oLoginBtn.Text = "Login";
@@ -692,7 +783,10 @@ namespace EyesonApp
 
         private int LoginNormalDevice()
         {
-            m_oNetDvrDeviceInfoV30 = new NET_DVR_DEVICEINFO_V30();
+            m_oNetDvrDeviceInfoV30 = new NET_DVR_DEVICEINFO_V30
+            {
+                ByAlarmInPortNum = default
+            };
 
             if (null == m_oNetDvrDeviceInfoV30)
             {
