@@ -113,11 +113,22 @@ namespace EyesonApp.Activities
                 Finish();
             }
 
-            SetIPAddressToIPLabel();
-
             SetGlobalAppContext();
 
             ShowAlertAboutApp();
+
+            CheckInternetConnection();
+
+            Xamarin.Essentials.Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
+        }
+
+        private void CheckInternetConnection()
+        {
+            if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.Internet)
+            {
+                SetIPAddressToIPLabel();
+            }
+            SetIPAddressToIPLabel();
         }
 
         private void ShowAlertAboutApp()
@@ -139,18 +150,29 @@ namespace EyesonApp.Activities
             new System.Threading.Thread(new ThreadStart(() => {
                 AsynchronousSocketListener.StartListening();
             })).Start();
-
-            Xamarin.Essentials.Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
         }
 
         private void Connectivity_ConnectivityChanged(object sender, Xamarin.Essentials.ConnectivityChangedEventArgs e)
         {
+            if (e.NetworkAccess == Xamarin.Essentials.NetworkAccess.Internet)
+            {
+                SetIPAddressToIPLabel();
+                StartSocketListening();
+            }
+            else
+            {
+                ShowFancyMessage(this, "No internet connection", Color:Resource.Color.error_color_material_light, Duration:3500);
+                SetIPAddressToIPLabel();
+                StartSocketListening();
+            }
         }
 
         private void SetIPAddressToIPLabel()
         {
             var IP = GetIP();
-            m_IPAdrs.Text = m_IPAdrs.Text + ":" + IP + " Port: 7555";
+            var emptyIp = IP == "0.0.0.0" ? true : false;
+            var message = emptyIp == false ? " " + IP + " listening on Port 7555" : " " + IP + " there's a network issue";
+            m_IPAdrs.Text = message;
             m_IPAdrs.Selected = true;
         }
 
@@ -273,6 +295,8 @@ namespace EyesonApp.Activities
 
         private void Record_Listener(object sender, EventArgs e)
         {
+            IsThereInternetOnDevice();
+
             var random = new System.Random(12000);
            
             if (!m_bSaveRealData)
@@ -313,7 +337,16 @@ namespace EyesonApp.Activities
                 m_bSaveRealData = false;
             }
         }
-    
+
+        private void IsThereInternetOnDevice()
+        {
+            if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.None || Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.Unknown)
+            {
+                ShowFancyMessage(this, "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
+                return;
+            }
+        }
+
         private void M_oTime_FocusChange(object sender, View.FocusChangeEventArgs e)
         {
             CanShowDateDialog = false;
@@ -391,6 +424,8 @@ namespace EyesonApp.Activities
 
         private void Capture_Listener(object sender, EventArgs e)
         {
+            IsThereInternetOnDevice();
+
             try
             {
                 var port = Player.Instance.Port;
@@ -551,6 +586,8 @@ namespace EyesonApp.Activities
 
         private void Preview_Listener(object sender, EventArgs e)
         {
+            IsThereInternetOnDevice();
+
             m_oDate.Text = "";
             m_oTime.Text = "";
             Task.Run(()=>
@@ -643,6 +680,7 @@ namespace EyesonApp.Activities
 
         private void Login_Listener(object sender, EventArgs e)
         {
+            IsThereInternetOnDevice();
             try
             {
                 if (m_oIPAddr.Text.Trim().Length == 0 || m_oPort.Text.Trim().Length == 0 || m_oUser.Text.Trim().Length == 0 || m_oPsd.Text.Trim().Length == 0)
