@@ -4,7 +4,7 @@
     <color android:color="@color/splash_background"/>
   </item>
   <item>
-    <bitmap android:src="@mipmap/splash_logo"
+    <bitmap android:src="@mipmap/ic_launcher"
             android:tileMode="disabled"
             android:filter="true"
             android:antialias="true"
