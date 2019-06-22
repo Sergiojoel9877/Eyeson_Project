@@ -32,7 +32,7 @@ namespace EyesonApp.Controls
         public int M_lUserID = -1;
         public int M_iChan = 0;
 
-        public PlaySurfaceView(MainActivity context) : base(context)
+        public PlaySurfaceView(Context context) : base(context)
         {
             M_hHolder = this.Holder;
             Holder.AddCallback(this);
@@ -65,7 +65,7 @@ namespace EyesonApp.Controls
         public void SetParam(int NScreenSize)
         {
             M_iWidth = NScreenSize / 2;
-            M_iHeight = (M_iWidth * 3) / 4;
+            M_iHeight = (M_iWidth * 4) / 4;
         }
 
         public void StartPreview(int IUserID, int IChan)
