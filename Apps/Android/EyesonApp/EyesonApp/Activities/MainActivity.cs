@@ -1,12 +1,5 @@
-﻿using System;
-using System.Net;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Android.App;
+﻿using Android.App;
 using Android.Content;
-using Android.Icu.Text;
-using Android.Icu.Util;
 using Android.Net.Wifi;
 using Android.OS;
 using Android.Runtime;
@@ -22,9 +15,11 @@ using EyesonApp.Controls;
 using EyesonApp.Services;
 using Java.IO;
 using Java.Lang;
-using Java.Util;
 using Org.Aviran.Cookiebar2;
 using Org.MediaPlayer.PlayM4;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Xamarin.Essentials;
 using AlertDialog = Android.Support.V7.App.AlertDialog;
 using Console = System.Console;
@@ -37,12 +32,8 @@ namespace EyesonApp.Activities
         private static Button m_oLoginBtn = null;
         private static Button m_oPreviewBtn = null;
         private static Button m_oPlaybackBtn = null;
-        private static Button m_oParamCfgBtn = null;
         private static Button m_oCaptureBtn = null;
         private static Button m_oRecordBtn = null;
-        private static Button m_oTalkBtn = null;
-        private static Button m_oPTZBtn = null;
-        private static Button m_oOtherBtn = null;
         private static EditText m_oIPAddr = null;
         private static EditText m_oPort = null;
         private static EditText m_oUser = null;
@@ -51,10 +42,14 @@ namespace EyesonApp.Activities
         private static EditText m_oDate = null;
         private static EditText m_oTime = null;
         private static TextView m_IPAdrs = null;
+        private static SurfaceView m_surface = null;
         private static TimePicker timePicker;
         private static DatePicker datePicker;
-        private Android.Icu.Util.Calendar calendar;
-        private NET_DVR_DEVICEINFO_V30 m_oNetDvrDeviceInfoV30 = null;
+        private NET_DVR_DEVICEINFO_V30 m_oNetDvrDeviceInfoV30;
+
+        private static Action NonStaticDelegate;
+
+        static MainActivity main { get; set; }
 
         public static MainActivity MContext { get; set; }
 
@@ -84,6 +79,12 @@ namespace EyesonApp.Activities
         public bool CanShowDateDialog { get; private set; }
 
         private static PlaySurfaceView[] playView = new PlaySurfaceView[4];
+
+        //public MainActivity()
+        //{
+        //    metric = new DisplayMetrics();
+        //    WindowManager.DefaultDisplay.GetMetrics(metric);
+        //}
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -161,7 +162,7 @@ namespace EyesonApp.Activities
             }
             else
             {
-                ShowFancyMessage(this, "No internet connection", Color:Resource.Color.error_color_material_light, Duration:3500);
+                ShowFancyMessage(GetApplicationContext(), "No internet connection", Color:Resource.Color.error_color_material_light, Duration:3500);
                 SetIPAddressToIPLabel();
                 StartSocketListening();
             }
@@ -185,6 +186,7 @@ namespace EyesonApp.Activities
             return ipaddress;
         }
 
+
         public static void SetDataToControls()
         {
             var _result = DataSingleton.Instance();
@@ -203,8 +205,18 @@ namespace EyesonApp.Activities
                     m_oDate.Text = new System.Text.StringBuilder().Append(Day).Append("/").Append(Month).Append("/").Append(Year).ToString();
 
                     m_iStartChan = Convert.ToInt32(m_oCam.Text) - 1;
+
+                    InvokeLoginListener();
+                   
                 });
             }
+        }
+
+        private static void InvokeLoginListener()
+        {
+            main = new MainActivity();
+            MainActivity.NonStaticDelegate = new Action(main.Login_Listener);
+            MainActivity.NonStaticDelegate?.Invoke();
         }
 
         private static void ParseDate(DateTimeOffset date)
@@ -228,7 +240,7 @@ namespace EyesonApp.Activities
 
         private void FabOnClick(object sender, EventArgs eventArgs)
         {
-            ShowFancyMessage(this, "Eyeson App Beta 1.0.0", Position: CookieBar.Bottom, Color:Resource.Color.material_blue_grey_800);
+            ShowFancyMessage(GetApplicationContext(), "Eyeson App Beta 1.0.0", Position: CookieBar.Bottom, Color:Resource.Color.material_blue_grey_800);
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -242,7 +254,7 @@ namespace EyesonApp.Activities
             int id = item.ItemId;
             if (id == Resource.Id.action_settings)
             {
-                ShowFancyMessage(this, "Compatible With", message: "HikVision SDK", Position: CookieBar.Bottom, Color: Resource.Color.material_blue_grey_800, Duration: 3500);
+                ShowFancyMessage(GetApplicationContext(), "Compatible With", message: "HikVision SDK", Position: CookieBar.Bottom, Color: Resource.Color.material_blue_grey_800, Duration: 3500);
                 return true;
             }
 
@@ -262,7 +274,7 @@ namespace EyesonApp.Activities
             if (!HCNetSDK.Instance.NET_DVR_Init())
             {
                 System.Console.WriteLine("HCNetSDK init is failed");
-                ShowFancyMessage(this, "The HCNetSDK has failed to init", Position:CookieBar.Top, Color: Resource.Color.material_blue_grey_800, Duration:1500);
+                ShowFancyMessage(GetApplicationContext(), "The HCNetSDK has failed to init", Position:CookieBar.Top, Color: Resource.Color.material_blue_grey_800, Duration:1500);
                 return false;
             }
             HCNetSDK.Instance.NET_DVR_SetLogToFile(3, "/mnt/sdcard/sdklog/", true);
@@ -278,7 +290,6 @@ namespace EyesonApp.Activities
 
         private void FindViews()
         {
-            m_oLoginBtn = (Button)FindViewById(Resource.Id.btn_Login);
             m_oPreviewBtn = (Button)FindViewById(Resource.Id.btn_Preview);
             m_oPlaybackBtn = (Button)FindViewById(Resource.Id.btn_Playback);
             m_oCaptureBtn = (Button)FindViewById(Resource.Id.btn_Capture);
@@ -291,6 +302,7 @@ namespace EyesonApp.Activities
             m_oDate = (EditText)FindViewById(Resource.Id.EDT_Date);
             m_oTime = (EditText)FindViewById(Resource.Id.EDT_Hr);
             m_IPAdrs = (TextView)FindViewById(Resource.Id.ipPlaceHolder);
+            m_surface = (SurfaceView)FindViewById(Resource.Id.Sur_Player);
         }
 
         private void Record_Listener(object sender, EventArgs e)
@@ -304,18 +316,18 @@ namespace EyesonApp.Activities
                 //
                 // Documents folder
                 string documentsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyVideos) + $"_{random.Next(12000)}.mp4";
-                //string documentsPath = this.GetExternalFilesDir($"_{random.Next(12000)}").AbsolutePath;
+                //string documentsPath = GetApplicationContext().GetExternalFilesDir($"_{random.Next(12000)}").AbsolutePath;
                 //string documentsPath = $"/storage/emulated/0/" + $"_{random.Next()}.mp4";
                 if (!HCNetSDK.Instance.NET_DVR_SaveRealData(m_iPlayID, documentsPath))
                 {
                     Console.WriteLine("NET_DVR_SaveRealData failed! error: " + HCNetSDK.Instance.NET_DVR_GetLastError());
-                    ShowFancyMessage(this, $"There's an error: Code: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to start saving the video", Position:CookieBar.Top, Color:Resource.Color.error_color_material_light, Duration: 23000);
+                    ShowFancyMessage(GetApplicationContext(), $"There's an error: Code: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to start saving the video", Position:CookieBar.Top, Color:Resource.Color.error_color_material_light, Duration: 23000);
                     return;
                 }
                 else
                 {
                     Console.WriteLine("NET_DVR_SaveRealData success!");
-                    ShowFancyMessage(this, "Saving data in realtime", SwipeToDismissEnabled: true, Position: CookieBar.Top, Duration: 2000);
+                    ShowFancyMessage(GetApplicationContext(), "Saving data in realtime", SwipeToDismissEnabled: true, Position: CookieBar.Top, Duration: 2000);
                 }
                 m_bSaveRealData = true;
             }
@@ -326,13 +338,13 @@ namespace EyesonApp.Activities
                     Console.WriteLine("NET_DVR_StopSaveRealData failed! error: "
                                     + HCNetSDK.Instance
                                             .NET_DVR_GetLastError());
-                    ShowFancyMessage(this, $"There's an error at: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to stop saving the video", Position: CookieBar.Top, Color: Resource.Color.error_color_material_light, Duration: 23000);
+                    ShowFancyMessage(GetApplicationContext(), $"There's an error at: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to stop saving the video", Position: CookieBar.Top, Color: Resource.Color.error_color_material_light, Duration: 23000);
 
                 }
                 else
                 {
                     Console.WriteLine("NET_DVR_SaveRealData success!");
-                    ShowFancyMessage(this, "Realtime data saved.", SwipeToDismissEnabled: true, Position: CookieBar.Top, Duration: 2000);
+                    ShowFancyMessage(GetApplicationContext(), "Realtime data saved.", SwipeToDismissEnabled: true, Position: CookieBar.Top, Duration: 2000);
                 }
                 m_bSaveRealData = false;
             }
@@ -342,7 +354,7 @@ namespace EyesonApp.Activities
         {
             if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.None || Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.Unknown)
             {
-                ShowFancyMessage(this, "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
+                ShowFancyMessage(GetApplicationContext(), "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
                 return;
             }
         }
@@ -371,11 +383,11 @@ namespace EyesonApp.Activities
         {
             if (id == 999)
             {
-                return new DatePickerDialog(this, DateListener, Year, Month, Day);
+                return new DatePickerDialog(GetApplicationContext(), DateListener, Year, Month, Day);
             }
             if (id == 998)
             {
-                return new TimePickerDialog(this, TimeListener, Hour, Minute, false);
+                return new TimePickerDialog(GetApplicationContext(), TimeListener, Hour, Minute, false);
             }
             return base.OnCreateDialog(id); 
         }
@@ -410,7 +422,7 @@ namespace EyesonApp.Activities
 
         private void SetListeners()
         {
-            m_oLoginBtn.Click += Login_Listener;
+            //m_oLoginBtn.Click += Login_Listener;
             m_oPreviewBtn.Click += Preview_Listener;
             m_oRecordBtn.Click += Record_Listener;
             m_oPlaybackBtn.Click += M_oPlaybackBtn_Click;
@@ -432,7 +444,7 @@ namespace EyesonApp.Activities
                 if (/*m_iPort < 0*/ port < 0)
                 {
                     Log.Error("EYESON APP", "please start preview first");
-                    ShowFancyMessage(this, "Please start previewing first", Color: Resource.Color.error_color_material_light, Duration: 2000);
+                    ShowFancyMessage(GetApplicationContext(), "Please start previewing first", Color: Resource.Color.error_color_material_light, Duration: 2000);
                     return;
                 }
 
@@ -442,7 +454,7 @@ namespace EyesonApp.Activities
                 if (!Player.Instance.GetPictureSize(port, stWidth, stHeight))
                 {
                     Log.Error("EYESON", "please start preview first");
-                    ShowFancyMessage(this, "Please start previewing first", Color:Resource.Color.error_color_material_light, Duration:2000);
+                    ShowFancyMessage(GetApplicationContext(), "Please start previewing first", Color:Resource.Color.error_color_material_light, Duration:2000);
                     return;
                 }
 
@@ -455,7 +467,7 @@ namespace EyesonApp.Activities
                 {
                     var error = Player.Instance.GetLastError(port);
                     Log.Error("EYESON APP", $"getBMP failed with error code: {error}");
-                    ShowFancyMessage(this, $"Capturing function failed: {error}", Color: Resource.Color.error_color_material_light, Duration: 2000);
+                    ShowFancyMessage(GetApplicationContext(), $"Capturing function failed: {error}", Color: Resource.Color.error_color_material_light, Duration: 2000);
                     return;
                 }
                 //var path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonPictures);
@@ -479,7 +491,7 @@ namespace EyesonApp.Activities
                 if (m_iLogID < 0)
                 {
                     Log.Error("EYESON APP", "please login on a device first");
-                    ShowFancyMessage(this, "Please login first", Color: Resource.Color.error_color_material_light);
+                    ShowFancyMessage(GetApplicationContext(), "Please login first", Color: Resource.Color.error_color_material_light);
                     return;
                 }
                 if (m_iPlaybackID < 0)
@@ -487,7 +499,7 @@ namespace EyesonApp.Activities
                     if (m_iPlayID >= 0)
                     {
                         Log.Info("EYESON APP", "Please stop preview first");
-                        ShowFancyMessage(this, "Please stop Preview function first", Color: Resource.Color.error_color_material_light);
+                        ShowFancyMessage(GetApplicationContext(), "Please stop Preview function first", Color: Resource.Color.error_color_material_light);
                         return;
                     }
 
@@ -525,7 +537,7 @@ namespace EyesonApp.Activities
                         if (!HCNetSDK.Instance.NET_DVR_PlayBackControl_V40(m_iPlaybackID, PlaybackControlCommand.NetDvrPlaystart, null, 0, struPlaybackInfo))
                         {
                             Log.Error("EYESON APP", "net sdk playback start failed!");
-                            ShowFancyMessage(this, "NET_SDK_Playback start failed, try again.");
+                            ShowFancyMessage(GetApplicationContext(), "NET_SDK_Playback start failed, try again.");
                             return;
                         }
                         m_bStopPlayback = false;
@@ -562,7 +574,7 @@ namespace EyesonApp.Activities
                         Log.Info("EYESON APP", "NET_DVR_PlayBackByTime failed, error code: " + HCNetSDK.Instance.NET_DVR_GetLastError());
                         var code = HCNetSDK.Instance.NET_DVR_GetLastError();
                         var msg = code == 10 ? "Connection Time out, try again" : "";
-                        ShowFancyMessage(this, "NET_DVR_PlayBackByTime failed, error code: " + code, message: msg, Color:Resource.Color.error_color_material_light, Duration:3000);
+                        ShowFancyMessage(GetApplicationContext(), "NET_DVR_PlayBackByTime failed, error code: " + code, message: msg, Color:Resource.Color.error_color_material_light, Duration:3000);
                     }
                 }
                 else
@@ -571,7 +583,7 @@ namespace EyesonApp.Activities
                     if (!HCNetSDK.Instance.NET_DVR_StopPlayBack(m_iPlaybackID))
                     {
                         Log.Error("EYESON APP", "net sdk stop playback failed");
-                        ShowFancyMessage(this, "NET_SDK_Playback failed", Color:Resource.Color.error_color_material_light, Duration: 23000);
+                        ShowFancyMessage(GetApplicationContext(), "NET_SDK_Playback failed", Color:Resource.Color.error_color_material_light, Duration: 23000);
                     }
                     m_oPlaybackBtn.Text = "Playback";
                     m_iPlaybackID = -1;
@@ -580,7 +592,7 @@ namespace EyesonApp.Activities
             catch (System.Exception er)
             {
                 Log.Error("EYESON APP", "Error: " + er.StackTrace);
-                ShowFancyMessage(this, "Please login first", message: "Fatal error: " + er.StackTrace, Color: Resource.Color.error_color_material_light);
+                ShowFancyMessage(GetApplicationContext(), "Please login first", message: "Fatal error: " + er.StackTrace, Color: Resource.Color.error_color_material_light);
             }
         }
 
@@ -602,19 +614,19 @@ namespace EyesonApp.Activities
                         });
                     }
 
-                    InputMethodManager inputManager = (InputMethodManager)this.GetSystemService(Context.InputMethodService);
-                    inputManager.HideSoftInputFromWindow(this.CurrentFocus.WindowToken, HideSoftInputFlags.NotAlways);
+                    InputMethodManager inputManager = (InputMethodManager)GetApplicationContext().GetSystemService(Context.InputMethodService);
+                    inputManager.HideSoftInputFromWindow(GetApplicationContext().CurrentFocus.WindowToken, HideSoftInputFlags.NotAlways);
 
                     if (m_iLogID < 0)
                     {
                         Log.Error("", "Please login in device first");
-                        ShowFancyMessage(this, "Please log in first", Color: Resource.Color.error_color_material_light);
+                        ShowFancyMessage(GetApplicationContext(), "Please log in first", Color: Resource.Color.error_color_material_light);
                         return;
                     }
                     if (m_iPlaybackID >= 0)
                     {
                         Log.Info("", "Please stop palyback first");
-                        ShowFancyMessage(this, "Please stop playback first", Color: Resource.Color.error_color_material_light, Duration: 23000);
+                        ShowFancyMessage(GetApplicationContext(), "Please stop playback first", Color: Resource.Color.error_color_material_light, Duration: 23000);
                         return;
                     }
 
@@ -678,14 +690,15 @@ namespace EyesonApp.Activities
             });
         }
 
-        private void Login_Listener(object sender, EventArgs e)
+        private void Login_Listener()
         {
             IsThereInternetOnDevice();
+
             try
             {
                 if (m_oIPAddr.Text.Trim().Length == 0 || m_oPort.Text.Trim().Length == 0 || m_oUser.Text.Trim().Length == 0 || m_oPsd.Text.Trim().Length == 0)
                 {
-                    ShowFancyMessage(this, "Fill every field", Color:Resource.Color.error_color_material_light);
+                    ShowFancyMessage(main, "Fill every field", Color:Resource.Color.error_color_material_light);
                     return;
                 }
                 if (m_iLogID < 0)
@@ -695,7 +708,7 @@ namespace EyesonApp.Activities
                     if (m_iLogID < 0)
                     {
                         Console.WriteLine("This device logins failed!");
-                        ShowFancyMessage(this, "Login failed, try again", Position:CookieBar.Top, Color:Resource.Color.error_color_material_light);
+                        ShowFancyMessage(GetApplicationContext(), "Login failed, try again", Position:CookieBar.Top, Color:Resource.Color.error_color_material_light);
                         return;
                     }
                     else
@@ -703,21 +716,18 @@ namespace EyesonApp.Activities
                         Console.WriteLine("m_iLogID=" + m_iLogID);
                     }
 
-                    m_oLoginBtn.Text = "Logout";
-
                     Log.Info("", "Login sucess ****************************1***************************");
 
-                    ShowFancyMessage(this, "Logged in successfully");
+                    ShowFancyMessage(GetApplicationContext(), "Logged in successfully");
                 }
                 else
                 {
                     if (!HCNetSDK.Instance.NET_DVR_Logout_V30(m_iLogID))
                     {
                         Log.Error("", "NET_DVR_Logout is failed!");
-                        ShowFancyMessage(this, "NET_DVR_Logout is failed");
+                        ShowFancyMessage(GetApplicationContext(), "NET_DVR_Logout is failed");
                         return;
                     }
-                    m_oLoginBtn.Text = "Login";
                     m_iLogID = -1;
                 }
             }
@@ -733,7 +743,7 @@ namespace EyesonApp.Activities
                 .SetSwipeToDismiss(SwipeToDismissEnabled)
                 .SetCookiePosition(Position)
                 .SetMessage(message)
-                //.SetIcon()
+                .SetIcon(Resource.Mipmap.ic_launcher)
                 .SetBackgroundColor(Color)
                 .SetDuration(Duration)
                 .Show();
@@ -752,7 +762,7 @@ namespace EyesonApp.Activities
             {
                 Log.Error("", "StopRealPlay is failed!Err:"
                         + HCNetSDK.Instance.NET_DVR_GetLastError());
-                ShowFancyMessage(this, "StopRealPlay failed", Color:Resource.Color.error_color_material_light, Duration: 23000);
+                ShowFancyMessage(GetApplicationContext(), "StopRealPlay failed", Color:Resource.Color.error_color_material_light, Duration: 23000);
                 return;
             }
 
@@ -764,7 +774,7 @@ namespace EyesonApp.Activities
             if (m_iPlaybackID >= 0)
             {
                 Log.Info("", "Please stop plaback first");
-                ShowFancyMessage(this, "Please stop playback first", Color: Resource.Color.error_color_material_light);
+                ShowFancyMessage(GetApplicationContext(), "Please stop playback first", Color: Resource.Color.error_color_material_light);
                 return;
             }
 
@@ -812,9 +822,6 @@ namespace EyesonApp.Activities
             int iLogID = -1;
 
             iLogID = LoginNormalDevice();
-
-            // iLogID = JNATest.TEST_EzvizLogin();
-            // iLogID = loginEzvizDevice();
 
             return iLogID;
         }
@@ -874,15 +881,15 @@ namespace EyesonApp.Activities
 
         private void ChangeSingleSurFace(bool bSingle)
         {
-            DisplayMetrics metric = new DisplayMetrics();
-            WindowManager.DefaultDisplay.GetMetrics(metric);
+            //DisplayMetrics metric = new DisplayMetrics();
+            //GetApplicationContext().WindowManager.DefaultDisplay.GetMetrics(metric);
 
             for (int i = 0; i < 4; i++)
             {
                 if (playView[i] == null)
                 {
-                    playView[i] = new PlaySurfaceView(this);
-                    playView[i].SetParam(metric.WidthPixels);
+                    playView[i] = new PlaySurfaceView(GetApplicationContext().ApplicationContext);
+                    playView[i].SetParam(m_surface.Width);
 
                     FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
@@ -892,7 +899,7 @@ namespace EyesonApp.Activities
 
                     playView[0].LayoutParameters = @params;
 
-                    AddContentView(playView[i], @params);
+                    GetApplicationContext().AddContentView(playView[i], @params);
                     playView[i].Visibility = ViewStates.Invisible;
                 }
             }
@@ -904,7 +911,7 @@ namespace EyesonApp.Activities
                     playView[i].Visibility = ViewStates.Invisible;
                 }
 
-                playView[0].SetParam(metric.WidthPixels * 2);
+                playView[0].SetParam(m_surface.Width * 2);
 
                 FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
@@ -923,7 +930,7 @@ namespace EyesonApp.Activities
                     playView[i].Visibility = ViewStates.Visible;
                 }
 
-                playView[0].SetParam(metric.WidthPixels);
+                playView[0].SetParam(m_surface.Width);
                 FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
                 @params.BottomMargin = playView[0].M_iHeight - (0 / 2) * playView[0].M_iHeight;
