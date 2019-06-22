@@ -3293,26 +3293,26 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09003a
 			public const int CTRL = 2131296314;
 			
-			// aapt resource value: 0x7f0900b7
-			public const int EDT_Cam = 2131296439;
-			
-			// aapt resource value: 0x7f0900b8
-			public const int EDT_Date = 2131296440;
-			
 			// aapt resource value: 0x7f0900b9
-			public const int EDT_Hr = 2131296441;
+			public const int EDT_Cam = 2131296441;
 			
-			// aapt resource value: 0x7f0900b1
-			public const int EDT_IPAddr = 2131296433;
+			// aapt resource value: 0x7f0900ba
+			public const int EDT_Date = 2131296442;
 			
-			// aapt resource value: 0x7f0900b2
-			public const int EDT_Port = 2131296434;
-			
-			// aapt resource value: 0x7f0900b4
-			public const int EDT_Psd = 2131296436;
+			// aapt resource value: 0x7f0900bb
+			public const int EDT_Hr = 2131296443;
 			
 			// aapt resource value: 0x7f0900b3
-			public const int EDT_User = 2131296435;
+			public const int EDT_IPAddr = 2131296435;
+			
+			// aapt resource value: 0x7f0900b4
+			public const int EDT_Port = 2131296436;
+			
+			// aapt resource value: 0x7f0900b6
+			public const int EDT_Psd = 2131296438;
+			
+			// aapt resource value: 0x7f0900b5
+			public const int EDT_User = 2131296437;
 			
 			// aapt resource value: 0x7f09003b
 			public const int FUNCTION = 2131296315;
@@ -3326,8 +3326,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09003e
 			public const int SYM = 2131296318;
 			
-			// aapt resource value: 0x7f0900b5
-			public const int Sur_Player = 2131296437;
+			// aapt resource value: 0x7f0900b7
+			public const int Sur_Player = 2131296439;
 			
 			// aapt resource value: 0x7f09009a
 			public const int action_bar = 2131296410;
@@ -3350,17 +3350,17 @@ namespace EyesonApp
 			// aapt resource value: 0x7f090076
 			public const int action_bar_title = 2131296374;
 			
-			// aapt resource value: 0x7f0900d0
-			public const int action_container = 2131296464;
+			// aapt resource value: 0x7f0900d1
+			public const int action_container = 2131296465;
 			
 			// aapt resource value: 0x7f09009b
 			public const int action_context_bar = 2131296411;
 			
-			// aapt resource value: 0x7f0900db
-			public const int action_divider = 2131296475;
+			// aapt resource value: 0x7f0900dc
+			public const int action_divider = 2131296476;
 			
-			// aapt resource value: 0x7f0900d1
-			public const int action_image = 2131296465;
+			// aapt resource value: 0x7f0900d2
+			public const int action_image = 2131296466;
 			
 			// aapt resource value: 0x7f090003
 			public const int action_menu_divider = 2131296259;
@@ -3377,14 +3377,14 @@ namespace EyesonApp
 			// aapt resource value: 0x7f090078
 			public const int action_mode_close_button = 2131296376;
 			
-			// aapt resource value: 0x7f0900e0
-			public const int action_settings = 2131296480;
+			// aapt resource value: 0x7f0900e1
+			public const int action_settings = 2131296481;
 			
-			// aapt resource value: 0x7f0900d2
-			public const int action_text = 2131296466;
+			// aapt resource value: 0x7f0900d3
+			public const int action_text = 2131296467;
 			
-			// aapt resource value: 0x7f0900dc
-			public const int actions = 2131296476;
+			// aapt resource value: 0x7f0900dd
+			public const int actions = 2131296477;
 			
 			// aapt resource value: 0x7f090079
 			public const int activity_chooser_view_content = 2131296377;
@@ -3434,23 +3434,20 @@ namespace EyesonApp
 			// aapt resource value: 0x7f0900ac
 			public const int browser_actions_menu_view = 2131296428;
 			
-			// aapt resource value: 0x7f0900bd
-			public const int btn_Capture = 2131296445;
+			// aapt resource value: 0x7f0900be
+			public const int btn_Capture = 2131296446;
 			
-			// aapt resource value: 0x7f0900ba
-			public const int btn_Login = 2131296442;
+			// aapt resource value: 0x7f0900bd
+			public const int btn_Playback = 2131296445;
 			
 			// aapt resource value: 0x7f0900bc
-			public const int btn_Playback = 2131296444;
+			public const int btn_Preview = 2131296444;
 			
-			// aapt resource value: 0x7f0900bb
-			public const int btn_Preview = 2131296443;
+			// aapt resource value: 0x7f0900bf
+			public const int btn_Record = 2131296447;
 			
-			// aapt resource value: 0x7f0900b6
-			public const int btn_Record = 2131296438;
-			
-			// aapt resource value: 0x7f0900cf
-			public const int btn_action = 2131296463;
+			// aapt resource value: 0x7f0900d0
+			public const int btn_action = 2131296464;
 			
 			// aapt resource value: 0x7f09007f
 			public const int buttonPanel = 2131296383;
@@ -3470,8 +3467,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f090093
 			public const int checkbox = 2131296403;
 			
-			// aapt resource value: 0x7f0900da
-			public const int chronometer = 2131296474;
+			// aapt resource value: 0x7f0900db
+			public const int chronometer = 2131296475;
 			
 			// aapt resource value: 0x7f090061
 			public const int clip_horizontal = 2131296353;
@@ -3482,8 +3479,11 @@ namespace EyesonApp
 			// aapt resource value: 0x7f090040
 			public const int collapseActionView = 2131296320;
 			
-			// aapt resource value: 0x7f0900c1
-			public const int container = 2131296449;
+			// aapt resource value: 0x7f0900b1
+			public const int constraintLayout = 2131296433;
+			
+			// aapt resource value: 0x7f0900c2
+			public const int container = 2131296450;
 			
 			// aapt resource value: 0x7f09008f
 			public const int content = 2131296399;
@@ -3491,11 +3491,11 @@ namespace EyesonApp
 			// aapt resource value: 0x7f090082
 			public const int contentPanel = 2131296386;
 			
-			// aapt resource value: 0x7f0900cb
-			public const int cookie = 2131296459;
+			// aapt resource value: 0x7f0900cc
+			public const int cookie = 2131296460;
 			
-			// aapt resource value: 0x7f0900c2
-			public const int coordinator = 2131296450;
+			// aapt resource value: 0x7f0900c3
+			public const int coordinator = 2131296451;
 			
 			// aapt resource value: 0x7f090089
 			public const int custom = 2131296393;
@@ -3509,20 +3509,20 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09007c
 			public const int default_activity_button = 2131296380;
 			
-			// aapt resource value: 0x7f0900c4
-			public const int design_bottom_sheet = 2131296452;
+			// aapt resource value: 0x7f0900c5
+			public const int design_bottom_sheet = 2131296453;
+			
+			// aapt resource value: 0x7f0900ca
+			public const int design_menu_item_action_area = 2131296458;
 			
 			// aapt resource value: 0x7f0900c9
-			public const int design_menu_item_action_area = 2131296457;
+			public const int design_menu_item_action_area_stub = 2131296457;
 			
 			// aapt resource value: 0x7f0900c8
-			public const int design_menu_item_action_area_stub = 2131296456;
+			public const int design_menu_item_text = 2131296456;
 			
 			// aapt resource value: 0x7f0900c7
-			public const int design_menu_item_text = 2131296455;
-			
-			// aapt resource value: 0x7f0900c6
-			public const int design_navigation_view = 2131296454;
+			public const int design_navigation_view = 2131296455;
 			
 			// aapt resource value: 0x7f09006f
 			public const int dimensions = 2131296367;
@@ -3593,8 +3593,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09007e
 			public const int icon = 2131296382;
 			
-			// aapt resource value: 0x7f0900dd
-			public const int icon_group = 2131296477;
+			// aapt resource value: 0x7f0900de
+			public const int icon_group = 2131296478;
 			
 			// aapt resource value: 0x7f090041
 			public const int ifRoom = 2131296321;
@@ -3602,14 +3602,14 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09007b
 			public const int image = 2131296379;
 			
-			// aapt resource value: 0x7f0900d6
-			public const int info = 2131296470;
+			// aapt resource value: 0x7f0900d7
+			public const int info = 2131296471;
 			
 			// aapt resource value: 0x7f090066
 			public const int invisible = 2131296358;
 			
-			// aapt resource value: 0x7f0900be
-			public const int ipPlaceHolder = 2131296446;
+			// aapt resource value: 0x7f0900b8
+			public const int ipPlaceHolder = 2131296440;
 			
 			// aapt resource value: 0x7f090075
 			public const int italic = 2131296373;
@@ -3617,14 +3617,14 @@ namespace EyesonApp
 			// aapt resource value: 0x7f090000
 			public const int item_touch_helper_previous_elevation = 2131296256;
 			
-			// aapt resource value: 0x7f0900cc
-			public const int iv_icon = 2131296460;
+			// aapt resource value: 0x7f0900cd
+			public const int iv_icon = 2131296461;
 			
 			// aapt resource value: 0x7f09004e
 			public const int labeled = 2131296334;
 			
-			// aapt resource value: 0x7f0900c0
-			public const int largeLabel = 2131296448;
+			// aapt resource value: 0x7f0900c1
+			public const int largeLabel = 2131296449;
 			
 			// aapt resource value: 0x7f090054
 			public const int left = 2131296340;
@@ -3641,8 +3641,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09007d
 			public const int list_item = 2131296381;
 			
-			// aapt resource value: 0x7f0900df
-			public const int masked = 2131296479;
+			// aapt resource value: 0x7f0900e0
+			public const int masked = 2131296480;
 			
 			// aapt resource value: 0x7f0900a9
 			public const int message = 2131296425;
@@ -3662,8 +3662,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09002f
 			public const int multiply = 2131296303;
 			
-			// aapt resource value: 0x7f0900c5
-			public const int navigation_header_container = 2131296453;
+			// aapt resource value: 0x7f0900c6
+			public const int navigation_header_container = 2131296454;
 			
 			// aapt resource value: 0x7f090042
 			public const int never = 2131296322;
@@ -3674,14 +3674,14 @@ namespace EyesonApp
 			// aapt resource value: 0x7f090025
 			public const int normal = 2131296293;
 			
-			// aapt resource value: 0x7f0900d8
-			public const int notification_background = 2131296472;
+			// aapt resource value: 0x7f0900d9
+			public const int notification_background = 2131296473;
+			
+			// aapt resource value: 0x7f0900d5
+			public const int notification_main_column = 2131296469;
 			
 			// aapt resource value: 0x7f0900d4
-			public const int notification_main_column = 2131296468;
-			
-			// aapt resource value: 0x7f0900d3
-			public const int notification_main_column_container = 2131296467;
+			public const int notification_main_column_container = 2131296468;
 			
 			// aapt resource value: 0x7f090060
 			public const int outline = 2131296352;
@@ -3719,11 +3719,11 @@ namespace EyesonApp
 			// aapt resource value: 0x7f090055
 			public const int right = 2131296341;
 			
-			// aapt resource value: 0x7f0900d7
-			public const int right_icon = 2131296471;
+			// aapt resource value: 0x7f0900d8
+			public const int right_icon = 2131296472;
 			
-			// aapt resource value: 0x7f0900d5
-			public const int right_side = 2131296469;
+			// aapt resource value: 0x7f0900d6
+			public const int right_side = 2131296470;
 			
 			// aapt resource value: 0x7f09000c
 			public const int save_image_matrix = 2131296268;
@@ -3748,6 +3748,9 @@ namespace EyesonApp
 			
 			// aapt resource value: 0x7f090084
 			public const int scrollView = 2131296388;
+			
+			// aapt resource value: 0x7f0900b2
+			public const int scrollView2 = 2131296434;
 			
 			// aapt resource value: 0x7f09005d
 			public const int scrollable = 2131296349;
@@ -3800,8 +3803,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09002c
 			public const int showTitle = 2131296300;
 			
-			// aapt resource value: 0x7f0900bf
-			public const int smallLabel = 2131296447;
+			// aapt resource value: 0x7f0900c0
+			public const int smallLabel = 2131296448;
 			
 			// aapt resource value: 0x7f090016
 			public const int snackbar_action = 2131296278;
@@ -3878,8 +3881,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09005a
 			public const int textStart = 2131296346;
 			
-			// aapt resource value: 0x7f0900ca
-			public const int text_input_password_toggle = 2131296458;
+			// aapt resource value: 0x7f0900cb
+			public const int text_input_password_toggle = 2131296459;
 			
 			// aapt resource value: 0x7f090018
 			public const int textinput_counter = 2131296280;
@@ -3890,8 +3893,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09001a
 			public const int textinput_helper_text = 2131296282;
 			
-			// aapt resource value: 0x7f0900d9
-			public const int time = 2131296473;
+			// aapt resource value: 0x7f0900da
+			public const int time = 2131296474;
 			
 			// aapt resource value: 0x7f090023
 			public const int title = 2131296291;
@@ -3911,8 +3914,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09008a
 			public const int topPanel = 2131296394;
 			
-			// aapt resource value: 0x7f0900c3
-			public const int touch_outside = 2131296451;
+			// aapt resource value: 0x7f0900c4
+			public const int touch_outside = 2131296452;
 			
 			// aapt resource value: 0x7f09000f
 			public const int transition_current_scene = 2131296271;
@@ -3929,11 +3932,11 @@ namespace EyesonApp
 			// aapt resource value: 0x7f090013
 			public const int transition_transform = 2131296275;
 			
-			// aapt resource value: 0x7f0900ce
-			public const int tv_message = 2131296462;
+			// aapt resource value: 0x7f0900cf
+			public const int tv_message = 2131296463;
 			
-			// aapt resource value: 0x7f0900cd
-			public const int tv_title = 2131296461;
+			// aapt resource value: 0x7f0900ce
+			public const int tv_title = 2131296462;
 			
 			// aapt resource value: 0x7f090034
 			public const int uniform = 2131296308;
@@ -3950,8 +3953,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f09001b
 			public const int view_offset_helper = 2131296283;
 			
-			// aapt resource value: 0x7f0900de
-			public const int visible = 2131296478;
+			// aapt resource value: 0x7f0900df
+			public const int visible = 2131296479;
 			
 			// aapt resource value: 0x7f090043
 			public const int withText = 2131296323;
