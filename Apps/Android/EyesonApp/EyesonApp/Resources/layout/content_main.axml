@@ -21,111 +21,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <EditText
-                android:id="@+id/EDT_IPAddr"
-                android:layout_width="139dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="56dp"
-                android:hint="IP"
-                android:inputType="phone"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:text=""
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <EditText
-                android:id="@+id/EDT_Port"
-                android:layout_width="139dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="44dp"
-                android:layout_marginTop="56dp"
-                android:hint="Port"
-                android:inputType="number"
-                android:text=""
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@+id/EDT_IPAddr"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <EditText
-                android:id="@+id/EDT_User"
-                android:layout_width="139dp"
-                android:layout_height="45dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:hint="User"
-                android:text=""
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_IPAddr" />
-
-            <EditText
-                android:id="@+id/EDT_Psd"
-                android:layout_width="139dp"
-                android:layout_height="43dp"
-                android:layout_marginStart="44dp"
-                android:layout_marginTop="16dp"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:text=""
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@+id/EDT_User"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_Port" />
-
             <SurfaceView
                 android:id="@+id/Sur_Player"
                 android:layout_width="0dp"
                 android:layout_height="300dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="42dp"
                 android:background="#0000ff00"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/ipPlaceHolder" />
-
-            <EditText
-                android:id="@+id/EDT_Cam"
-                android:layout_width="139dp"
-                android:layout_height="43dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:hint="Camera"
-                android:inputType="number"
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_Date" />
-
-            <EditText
-                android:id="@+id/EDT_Date"
-                android:layout_width="139dp"
-                android:layout_height="41dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:editable="false"
-                android:hint="Date"
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_User" />
-
-            <EditText
-                android:id="@+id/EDT_Hr"
-                android:layout_width="139dp"
-                android:layout_height="39dp"
-                android:layout_marginStart="44dp"
-                android:layout_marginTop="16dp"
-                android:editable="false"
-                android:hint="Time"
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@+id/EDT_Date"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_Psd" />
 
             <Button
                 android:id="@+id/btn_Preview"
@@ -193,11 +98,12 @@
 
             <TextView
                 android:id="@+id/ipPlaceHolder"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="188dp"
                 android:layout_marginEnd="8dp"
+                android:textSize="15sp"
                 android:ellipsize="marquee"
                 android:fadingEdge="horizontal"
                 android:focusable="true"
@@ -208,9 +114,9 @@
                 android:text="IP ADDRESS: "
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.025"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_Cam" />
+                app:layout_constraintTop_toTopOf="parent" />
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>
