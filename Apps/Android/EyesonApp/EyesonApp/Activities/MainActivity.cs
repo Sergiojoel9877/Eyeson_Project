@@ -622,6 +622,8 @@ namespace EyesonApp.Activities
                     Log.Info("", "Login sucess ****************************1***************************");
 
                     ShowFancyMessage(GetApplicationContext(), "Logged in successfully");
+
+                    m_iStartChan = Convert.ToInt32(data.Camera);
                 }
                 else
                 {
