@@ -3413,17 +3413,17 @@ namespace EyesonApp
 			// aapt resource value: 0x7f0900ac
 			public const int browser_actions_menu_view = 2131296428;
 			
-			// aapt resource value: 0x7f0900b7
-			public const int btn_Capture = 2131296439;
-			
 			// aapt resource value: 0x7f0900b6
-			public const int btn_Playback = 2131296438;
+			public const int btn_Capture = 2131296438;
 			
 			// aapt resource value: 0x7f0900b5
-			public const int btn_Preview = 2131296437;
+			public const int btn_Playback = 2131296437;
 			
-			// aapt resource value: 0x7f0900b8
-			public const int btn_Record = 2131296440;
+			// aapt resource value: 0x7f0900b4
+			public const int btn_Preview = 2131296436;
+			
+			// aapt resource value: 0x7f0900b7
+			public const int btn_Record = 2131296439;
 			
 			// aapt resource value: 0x7f0900c9
 			public const int btn_action = 2131296457;
@@ -3587,8 +3587,8 @@ namespace EyesonApp
 			// aapt resource value: 0x7f090066
 			public const int invisible = 2131296358;
 			
-			// aapt resource value: 0x7f0900b4
-			public const int ipPlaceHolder = 2131296436;
+			// aapt resource value: 0x7f0900b8
+			public const int ipPlaceHolder = 2131296440;
 			
 			// aapt resource value: 0x7f090075
 			public const int italic = 2131296373;
