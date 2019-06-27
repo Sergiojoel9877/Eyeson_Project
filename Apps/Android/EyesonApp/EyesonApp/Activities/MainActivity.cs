@@ -158,9 +158,11 @@ namespace EyesonApp.Activities
 
         private void SetIPAddressToIPLabel()
         {
-            var IP = GetIP();
-            var emptyIp = IP == "0.0.0.0" ? true : false;
-            var message = emptyIp == false ? " " + IP + " listening on Port 7555" : " " + IP + " there's a network issue";
+            //var IP = GetIP();
+            var IP = "127.0.0.1";
+            //var emptyIp = IP == "127.0.0.1" ? true : false;
+            //var message = emptyIp == false ? " " + IP + " listening on Port 7555" : " " + IP + " there's a network issue";
+            var message = IP + " listening on Port 7555";
             m_IPAdrs.Text = message;
             m_IPAdrs.Selected = true;
         }
@@ -795,7 +797,7 @@ namespace EyesonApp.Activities
 
                     FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                    @params.BottomMargin = playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth;
+                    @params.BottomMargin = playView[i].M_iHeight + (i / 2) / playView[i].M_iWidth;
                     @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
                     @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
 
@@ -817,7 +819,7 @@ namespace EyesonApp.Activities
 
                 FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                @params.BottomMargin = playView[3].M_iHeight - (3 / 2) * playView[3].M_iHeight;
+                @params.BottomMargin = playView[3].M_iHeight + (3 / 2) / playView[3].M_iHeight;
                 @params.LeftMargin = 0;
                 @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
 
