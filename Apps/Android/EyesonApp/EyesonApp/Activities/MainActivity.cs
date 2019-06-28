@@ -492,7 +492,7 @@ namespace EyesonApp.Activities
                         Log.Error("EYESON APP", "net sdk stop playback failed");
                         ShowFancyMessage(GetApplicationContext(), "NET_SDK_Playback failed", Color:Resource.Color.error_color_material_light, Duration: 23000);
                     }
-                    m_oPlaybackBtn.Text = "Playback";
+                    m_oPlaybackBtn.Text = "Play";
                     m_iPlaybackID = -1;
                 }
             }
@@ -518,9 +518,6 @@ namespace EyesonApp.Activities
                             ChangeSingleSurFace(false);
                         });
                     }
-
-                    InputMethodManager inputManager = (InputMethodManager)GetApplicationContext().GetSystemService(Context.InputMethodService);
-                    inputManager.HideSoftInputFromWindow(GetApplicationContext().CurrentFocus.WindowToken, HideSoftInputFlags.NotAlways);
 
                     if (m_iLogID < 0)
                     {
@@ -626,6 +623,20 @@ namespace EyesonApp.Activities
                     ShowFancyMessage(GetApplicationContext(), "Logged in successfully");
 
                     m_iStartChan = Convert.ToInt32(data.Camera);
+
+                    ShowFancyMessage(GetApplicationContext(), "Starting Playback, please Wait", Duration:2000);
+
+                    M_oPlaybackBtn_Click(null, null);
+                    //new System.Threading.Thread(new ThreadStart(()=>
+                    //{
+                    //    using (var h = new Handler(Looper.MainLooper)
+                    //    {
+                    //        h.Post(()=>
+                    //        {
+                    //            m_oPlaybackBtn.CallOnClick();
+                    //        });
+                    //    }
+                    //}));
                 }
                 else
                 {
@@ -797,7 +808,7 @@ namespace EyesonApp.Activities
 
                     FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                    @params.BottomMargin = playView[i].M_iHeight + (i / 2) / playView[i].M_iWidth;
+                    @params.BottomMargin = 210 + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + 220;
                     @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
                     @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
 
@@ -819,7 +830,7 @@ namespace EyesonApp.Activities
 
                 FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                @params.BottomMargin = playView[3].M_iHeight + (3 / 2) / playView[3].M_iHeight;
+                @params.BottomMargin = 210 + playView[3].M_iHeight - (2 / 2) * playView[3].M_iHeight + 220;
                 @params.LeftMargin = 0;
                 @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
 
@@ -837,7 +848,7 @@ namespace EyesonApp.Activities
                 playView[0].SetParam(m_surface.Width);
                 FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                @params.BottomMargin = playView[0].M_iHeight - (0 / 2) * playView[0].M_iHeight;
+                @params.TopMargin = 210 + playView[0].M_iHeight - (0 / 4) * playView[0].M_iHeight + 200;
                 @params.LeftMargin = (0 % 2) * playView[0].M_iWidth;
                 @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
 
