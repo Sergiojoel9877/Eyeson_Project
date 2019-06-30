@@ -39,8 +39,11 @@ namespace EyesonApp.Activities
         static DatePicker datePicker;
         NET_DVR_DEVICEINFO_V30 m_oNetDvrDeviceInfoV30;
 
-        delegate void NonStaticDelegate(EyesonApp.Models.Data data);
-        static NonStaticDelegate _NonStaticDelegate;
+        delegate void LoginListenerDelegate(EyesonApp.Models.Data data);
+        static LoginListenerDelegate _LoginListenerDelegate;
+
+        delegate void PlaybackListenerDelegate(object obj, EventArgs E);
+        static PlaybackListenerDelegate _PlaybackListenerDelegate;
 
         static MainActivity main { get; set; }
 
@@ -183,20 +186,31 @@ namespace EyesonApp.Activities
 
             using (var h = new Handler(Looper.MainLooper))
             {
-                h.Post(()=>
+                h.Post(async ()=>
                 {
-                    ParseDate(_result.Date);
-
-                    InvokeLoginListener(_result);
+                    if (!SaveLoginSessionSingleton.SessionLoggedIn())
+                    {
+                        ParseDate(_result.Date);
+                        InvokeLoginListener(_result);
+                    }
+                    await Task.Delay(1000);
+                    InvokePlaybackListener(null, null);
                 });
             }
+        }
+
+        private static void InvokePlaybackListener(object obj, EventArgs e)
+        {
+            main = new MainActivity();
+            MainActivity._PlaybackListenerDelegate = main.M_oPlaybackBtn_Click;
+            MainActivity._PlaybackListenerDelegate?.Invoke(null, null);
         }
 
         private static void InvokeLoginListener(EyesonApp.Models.Data data)
         {
             main = new MainActivity();
-            MainActivity._NonStaticDelegate = main.Login_Listener;
-            MainActivity._NonStaticDelegate?.Invoke(data);
+            MainActivity._LoginListenerDelegate = main.Login_Listener;
+            MainActivity._LoginListenerDelegate?.Invoke(data);
         }
 
         private static void ParseDate(DateTimeOffset date)
@@ -401,6 +415,7 @@ namespace EyesonApp.Activities
                     ShowFancyMessage(GetApplicationContext(), "Please login first", Color: Resource.Color.error_color_material_light);
                     return;
                 }
+
                 if (m_iPlaybackID < 0)
                 {
                     if (m_iPlayID >= 0)
@@ -433,7 +448,14 @@ namespace EyesonApp.Activities
                     struVod.StruBeginTime = struBegin;
                     struVod.StruEndTime = struEnd;
                     struVod.ByStreamType = 0;
-                    struVod.StruIDInfo.DwChannel = m_iStartChan == 0 ? Integer.ParseInt(m_iStartChan.ToString()) - 1 : Integer.ParseInt(m_iStartChan.ToString()) - 1;
+                    if (SaveLoginSessionSingleton.SessionLoggedIn())
+                    {
+                        struVod.StruIDInfo.DwChannel = Convert.ToInt32(DataSingleton.Instance().Camera) - 1;
+                    }
+                    else
+                    {
+                        struVod.StruIDInfo.DwChannel = m_iStartChan == 0 ? Integer.ParseInt(m_iStartChan.ToString()) - 1 : Integer.ParseInt(m_iStartChan.ToString()) - 1;
+                    }
                     struVod.HWnd = playView[0].Holder.Surface;
 
                     m_iPlaybackID = HCNetSDK.Instance.NET_DVR_PlayBackByTime_V40(m_iLogID, struVod);
@@ -494,6 +516,8 @@ namespace EyesonApp.Activities
                     }
                     m_oPlaybackBtn.Text = "Play";
                     m_iPlaybackID = -1;
+
+                    InvokePlaybackListener(null, null);
                 }
             }
             catch (System.Exception er)
@@ -506,6 +530,14 @@ namespace EyesonApp.Activities
         private void Preview_Listener(object sender, EventArgs e)
         {
             IsThereInternetOnDevice();
+
+            m_bStopPlayback = true;
+            if (!HCNetSDK.Instance.NET_DVR_StopPlayBack(m_iPlaybackID))
+            {
+                Log.Error("EYESON APP", "net sdk stop playback failed");
+            }
+            m_oPlaybackBtn.Text = "Play";
+            m_iPlaybackID = -1;
 
             Task.Run(()=>
             {
@@ -592,7 +624,7 @@ namespace EyesonApp.Activities
             });
         }
 
-        private void Login_Listener(EyesonApp.Models.Data data)
+        private async void Login_Listener(EyesonApp.Models.Data data)
         {
             IsThereInternetOnDevice();
 
@@ -624,9 +656,13 @@ namespace EyesonApp.Activities
 
                     m_iStartChan = Convert.ToInt32(data.Camera);
 
-                    ShowFancyMessage(GetApplicationContext(), "Starting Playback, please Wait", Duration:2000);
+                    SaveLoginSessionSingleton.SaveUserLoggedSession(true);
 
-                    M_oPlaybackBtn_Click(null, null);
+                    await Task.Delay(3000);
+
+                    ShowFancyMessage(GetApplicationContext(), "Starting Playback, please Wait", Duration:6000);
+
+                    //M_oPlaybackBtn_Click(null, null);
                     //new System.Threading.Thread(new ThreadStart(()=>
                     //{
                     //    using (var h = new Handler(Looper.MainLooper)
@@ -848,7 +884,7 @@ namespace EyesonApp.Activities
                 playView[0].SetParam(m_surface.Width);
                 FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                @params.TopMargin = 210 + playView[0].M_iHeight - (0 / 4) * playView[0].M_iHeight + 200;
+                @params.BottomMargin = 210 + playView[0].M_iHeight - (0 / 4) * playView[0].M_iHeight + 220;
                 @params.LeftMargin = (0 % 2) * playView[0].M_iWidth;
                 @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
 
