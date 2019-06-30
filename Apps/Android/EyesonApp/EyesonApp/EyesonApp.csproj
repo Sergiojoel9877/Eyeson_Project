@@ -99,6 +99,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AsynchronousSocketListener.cs" />
     <Compile Include="Services\DataSingleton.cs" />
+    <Compile Include="Services\SaveLoginSessionSingleton.cs" />
     <Compile Include="Services\StateObject.cs" />
   </ItemGroup>
   <ItemGroup>
