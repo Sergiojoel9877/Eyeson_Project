@@ -26,7 +26,6 @@ namespace EyesonApp.Services
 
         public AsynchronousSocketListener()
         {
-
         }
 
         public static void StartListening()
@@ -34,7 +33,7 @@ namespace EyesonApp.Services
             // Establish the local endpoint for the socket.  
             // The DNS name of the computer  
             // running the listener is "host.contoso.com".  
-            IPHostEntry ipHostInfo = Dns.GetHostEntry("127.0.0.1");
+            IPHostEntry ipHostInfo = Dns.GetHostEntry("localhost");
             IPAddress ipAddress = ipHostInfo.AddressList[0];
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 7555);
 

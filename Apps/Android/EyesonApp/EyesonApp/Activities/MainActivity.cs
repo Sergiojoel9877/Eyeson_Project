@@ -842,9 +842,11 @@ namespace EyesonApp.Activities
                     playView[i] = new PlaySurfaceView(GetApplicationContext().ApplicationContext);
                     playView[i].SetParam(m_surface.Width);
 
+                    //RelativeLayout.LayoutParams @params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WrapContent, RelativeLayout.LayoutParams.WrapContent);
+
                     FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                    @params.BottomMargin = 210 + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + 220;
+                    @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.56f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(m_surface.Width * 0.56f);
                     @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
                     @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
 
@@ -884,7 +886,7 @@ namespace EyesonApp.Activities
                 playView[0].SetParam(m_surface.Width);
                 FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                @params.BottomMargin = 210 + playView[0].M_iHeight - (0 / 4) * playView[0].M_iHeight + 220;
+                @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.56f) + playView[0].M_iHeight - (0 / 4) * playView[0].M_iHeight + Convert.ToInt32(m_surface.Width * 0.59f;
                 @params.LeftMargin = (0 % 2) * playView[0].M_iWidth;
                 @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
 
