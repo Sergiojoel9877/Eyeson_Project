@@ -26,7 +26,7 @@ using Console = System.Console;
 
 namespace EyesonApp.Activities
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/ThemeSplash", MainLauncher = true)]
+    [Activity(Label = "@string/app_name", Theme = "@style/ThemeSplash", MainLauncher = true, ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
     public class MainActivity : AppCompatActivity, IExceptionCallBack, ITextWatcher
     {
         static Button m_oPreviewBtn = null;
@@ -835,6 +835,9 @@ namespace EyesonApp.Activities
 
         private void ChangeSingleSurFace(bool bSingle)
         {
+
+            var surfaceOrientation = GetApplicationContext().WindowManager.DefaultDisplay.Rotation;
+
             for (int i = 0; i < 4; i++)
             {
                 if (playView[i] == null)
@@ -842,14 +845,25 @@ namespace EyesonApp.Activities
                     playView[i] = new PlaySurfaceView(GetApplicationContext().ApplicationContext);
                     playView[i].SetParam(m_surface.Width);
 
-                    //RelativeLayout.LayoutParams @params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WrapContent, RelativeLayout.LayoutParams.WrapContent);
+                    FrameLayout.LayoutParams @params;
 
-                    FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+                    if (surfaceOrientation == SurfaceOrientation.Rotation0 || surfaceOrientation == SurfaceOrientation.Rotation180)
+                    {
+                        @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                    @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.56f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(m_surface.Width * 0.56f);
-                    @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
-                    @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                        @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.35f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(m_surface.Width * 0.24f);
+                        @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
+                        @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                    }
+                    else
+                    {
+                        @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
+                        @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.1f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(m_surface.Width * 0.1f);
+                        @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
+                        @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                    }
+                   
                     playView[0].LayoutParameters = @params;
 
                     GetApplicationContext().AddContentView(playView[i], @params);
@@ -866,11 +880,24 @@ namespace EyesonApp.Activities
 
                 playView[0].SetParam(m_surface.Width * 2);
 
-                FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+                FrameLayout.LayoutParams @params;
 
-                @params.BottomMargin = 210 + playView[3].M_iHeight - (2 / 2) * playView[3].M_iHeight + 220;
-                @params.LeftMargin = 0;
-                @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                if (surfaceOrientation == SurfaceOrientation.Rotation0 || surfaceOrientation == SurfaceOrientation.Rotation180)
+                {
+                    @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+
+                    @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.35f) + playView[3].M_iHeight - (2 / 2) * playView[3].M_iHeight + Convert.ToInt32(m_surface.Width * 0.24f);
+                    @params.LeftMargin = 0;
+                    @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                }
+                else
+                {
+                    @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+
+                    @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.1f) + playView[3].M_iHeight - (2 / 2) * playView[3].M_iHeight + Convert.ToInt32(m_surface.Width * 0.1f);
+                    @params.LeftMargin = 0;
+                    @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                }
 
                 playView[0].LayoutParameters = @params;
 
@@ -884,11 +911,25 @@ namespace EyesonApp.Activities
                 }
 
                 playView[0].SetParam(m_surface.Width);
-                FrameLayout.LayoutParams @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.56f) + playView[0].M_iHeight - (0 / 4) * playView[0].M_iHeight + Convert.ToInt32(m_surface.Width * 0.59f;
-                @params.LeftMargin = (0 % 2) * playView[0].M_iWidth;
-                @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                FrameLayout.LayoutParams @params;
+
+                if (surfaceOrientation == SurfaceOrientation.Rotation0 || surfaceOrientation == SurfaceOrientation.Rotation180)
+                {
+                    @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+
+                    @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.35f) + playView[0].M_iHeight - (0 / 4) * playView[0].M_iHeight + Convert.ToInt32(m_surface.Width * 0.24f);
+                    @params.LeftMargin = (0 % 2) * playView[0].M_iWidth;
+                    @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                }
+                else
+                {
+                    @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+
+                    @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.1f) + playView[0].M_iHeight - (0 / 4) * playView[0].M_iHeight + Convert.ToInt32(m_surface.Width * 0.1f);
+                    @params.LeftMargin = (0 % 2) * playView[0].M_iWidth;
+                    @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                }
 
                 playView[0].LayoutParameters = @params;
             }
