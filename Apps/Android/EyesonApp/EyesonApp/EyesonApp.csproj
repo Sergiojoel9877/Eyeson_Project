@@ -70,12 +70,6 @@
     <Reference Include="CookieBar2">
       <HintPath>..\..\..\..\Bindings\Android\CookieBar2\CookieBar2\bin\Debug\CookieBar2.dll</HintPath>
     </Reference>
-    <Reference Include="HCNetSDK">
-      <HintPath>..\..\..\..\Bindings\Android\HCNetSDK\HCNetSDK\bin\Debug\HCNetSDK.dll</HintPath>
-    </Reference>
-    <Reference Include="PlayerSDK">
-      <HintPath>..\..\..\..\Bindings\Android\PlayerSDK\PlayerSDK\bin\Debug\PlayerSDK.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -98,6 +92,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\AsynchronousSocketListener.cs" />
     <Compile Include="Services\DataSingleton.cs" />
+    <Compile Include="Services\SaveLoginSessionSingleton.cs" />
     <Compile Include="Services\StateObject.cs" />
   </ItemGroup>
   <ItemGroup>

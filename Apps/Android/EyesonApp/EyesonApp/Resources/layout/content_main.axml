@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -21,111 +21,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <EditText
-                android:id="@+id/EDT_IPAddr"
-                android:layout_width="139dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="56dp"
-                android:hint="IP"
-                android:inputType="phone"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:text=""
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <EditText
-                android:id="@+id/EDT_Port"
-                android:layout_width="139dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="44dp"
-                android:layout_marginTop="56dp"
-                android:hint="Port"
-                android:inputType="number"
-                android:text=""
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@+id/EDT_IPAddr"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <EditText
-                android:id="@+id/EDT_User"
-                android:layout_width="139dp"
-                android:layout_height="45dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:hint="User"
-                android:text=""
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_IPAddr" />
-
-            <EditText
-                android:id="@+id/EDT_Psd"
-                android:layout_width="139dp"
-                android:layout_height="43dp"
-                android:layout_marginStart="44dp"
-                android:layout_marginTop="16dp"
-                android:hint="Password"
-                android:inputType="textPassword"
-                android:text=""
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@+id/EDT_User"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_Port" />
-
             <SurfaceView
                 android:id="@+id/Sur_Player"
                 android:layout_width="0dp"
-                android:layout_height="300dp"
-                android:layout_marginTop="20dp"
-                android:background="#0000ff00"
+                android:layout_height="360dp"
+                android:layout_marginTop="80dp"
+                android:background="@android:color/transparent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/ipPlaceHolder" />
-
-            <EditText
-                android:id="@+id/EDT_Cam"
-                android:layout_width="139dp"
-                android:layout_height="43dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:hint="Camera"
-                android:inputType="number"
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_Date" />
-
-            <EditText
-                android:id="@+id/EDT_Date"
-                android:layout_width="139dp"
-                android:layout_height="41dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:editable="false"
-                android:hint="Date"
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_User" />
-
-            <EditText
-                android:id="@+id/EDT_Hr"
-                android:layout_width="139dp"
-                android:layout_height="39dp"
-                android:layout_marginStart="44dp"
-                android:layout_marginTop="16dp"
-                android:editable="false"
-                android:hint="Time"
-                android:textColorHint="@android:color/black"
-                android:textStyle="bold"
-                app:layout_constraintStart_toEndOf="@+id/EDT_Date"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_Psd" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Button
                 android:id="@+id/btn_Preview"
@@ -133,16 +38,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
                 android:background="@mipmap/buttons_cornerRadius"
                 android:text="Preview"
                 android:textColor="#fff"
                 android:textStyle="bold"
                 android:typeface="sans"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/Sur_Player"
-                app:layout_constraintVertical_bias="1.0" />
+                app:layout_constraintTop_toBottomOf="@+id/Sur_Player" />
 
             <Button
                 android:id="@+id/btn_Playback"
@@ -151,13 +53,11 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
                 android:background="@mipmap/buttons_cornerRadius"
                 android:text="Play"
                 android:textColor="#fff"
                 android:textStyle="bold"
                 android:typeface="sans"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btn_Capture"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/Sur_Player" />
@@ -182,21 +82,24 @@
                 android:id="@+id/btn_Record"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="@mipmap/buttons_cornerRadius"
                 android:text="Record"
                 android:textColor="#fff"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/btn_Preview" />
+                app:layout_constraintBottom_toTopOf="@+id/ipPlaceHolder"
+                app:layout_constraintEnd_toStartOf="@+id/btn_Preview"
+                app:layout_constraintTop_toBottomOf="@+id/Sur_Player"
+                app:layout_constraintVertical_bias="0.0" />
 
             <TextView
                 android:id="@+id/ipPlaceHolder"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="40dp"
                 android:layout_marginEnd="8dp"
                 android:ellipsize="marquee"
                 android:fadingEdge="horizontal"
@@ -206,11 +109,12 @@
                 android:scrollHorizontally="true"
                 android:singleLine="true"
                 android:text="IP ADDRESS: "
+                android:textSize="30sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.025"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/EDT_Cam" />
+                app:layout_constraintTop_toBottomOf="@+id/btn_Capture" />
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>

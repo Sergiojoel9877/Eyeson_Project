@@ -26,7 +26,6 @@ namespace EyesonApp.Services
 
         public AsynchronousSocketListener()
         {
-
         }
 
         public static void StartListening()
@@ -34,7 +33,7 @@ namespace EyesonApp.Services
             // Establish the local endpoint for the socket.  
             // The DNS name of the computer  
             // running the listener is "host.contoso.com".  
-            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
+            IPHostEntry ipHostInfo = Dns.GetHostEntry("127.0.0.1");
             IPAddress ipAddress = ipHostInfo.AddressList[0];
             IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 7555);
 
@@ -130,9 +129,15 @@ namespace EyesonApp.Services
                 Models.Data _data = JsonConvert.DeserializeObject<Models.Data>(json);
                 DataSingleton.SetInstance(_data);
 
-                MainActivity.SetDataToControls();
-
                 memoryStream.Close();
+
+                using (var h = new Handler(Looper.MainLooper))
+                {
+                    h.Post(() =>
+                    {
+                        MainActivity.SetDataToControls();
+                    });
+                }
 
                 //Echo the data back to the client.
                 Send(handler, content);
