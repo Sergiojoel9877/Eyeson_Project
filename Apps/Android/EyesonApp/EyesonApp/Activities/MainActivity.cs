@@ -180,23 +180,18 @@ namespace EyesonApp.Activities
         }
 
 
-        public static void SetDataToControls()
+        public static async void SetDataToControls()
         {
             var _result = DataSingleton.Instance();
 
-            using (var h = new Handler(Looper.MainLooper))
+            if (!SaveLoginSessionSingleton.SessionLoggedIn())
             {
-                h.Post(async ()=>
-                {
-                    if (!SaveLoginSessionSingleton.SessionLoggedIn())
-                    {
-                        ParseDate(_result.Date);
-                        InvokeLoginListener(_result);
-                    }
-                    await Task.Delay(1000);
-                    InvokePlaybackListener(null, null);
-                });
+                ParseDate(_result.Date);
+                InvokeLoginListener(_result);
             }
+            await Task.Delay(100);
+
+            InvokePlaybackListener(null, null);
         }
 
         private static void InvokePlaybackListener(object obj, EventArgs e)
@@ -351,8 +346,20 @@ namespace EyesonApp.Activities
         {
             m_oPreviewBtn.Click += Preview_Listener;
             m_oRecordBtn.Click += Record_Listener;
-            m_oPlaybackBtn.Click += M_oPlaybackBtn_Click;
+            m_oPlaybackBtn.Click += PlaybackButtomCliked;
             m_oCaptureBtn.Click += Capture_Listener;
+        }
+
+        private void PlaybackButtomCliked(object sender, EventArgs e)
+        {
+            if (m_oPlaybackBtn.Text == "Stop")
+            {
+                StopPlayback();
+            }
+            else
+            {
+                InvokePlaybackListener(null, null);
+            }
         }
 
         private void Capture_Listener(object sender, EventArgs e)
@@ -407,6 +414,10 @@ namespace EyesonApp.Activities
 
         private void M_oPlaybackBtn_Click(object sender, EventArgs e)
         {
+            StopPlayback();
+
+            ShowFancyMessage(GetApplicationContext(), "Starting Playback, please Wait", message: "Please wait....", Duration: 6000);
+
             try
             {
                 if (m_iLogID < 0)
@@ -508,16 +519,9 @@ namespace EyesonApp.Activities
                 }
                 else
                 {
-                    m_bStopPlayback = true;
-                    if (!HCNetSDK.Instance.NET_DVR_StopPlayBack(m_iPlaybackID))
-                    {
-                        Log.Error("EYESON APP", "net sdk stop playback failed");
-                        ShowFancyMessage(GetApplicationContext(), "NET_SDK_Playback failed", Color:Resource.Color.error_color_material_light, Duration: 23000);
-                    }
-                    m_oPlaybackBtn.Text = "Play";
-                    m_iPlaybackID = -1;
+                    StopPlayback();
 
-                    InvokePlaybackListener(null, null);
+                    //InvokePlaybackListener(null, null);
                 }
             }
             catch (System.Exception er)
@@ -531,14 +535,8 @@ namespace EyesonApp.Activities
         {
             IsThereInternetOnDevice();
 
-            m_bStopPlayback = true;
-            if (!HCNetSDK.Instance.NET_DVR_StopPlayBack(m_iPlaybackID))
-            {
-                Log.Error("EYESON APP", "net sdk stop playback failed");
-            }
-            m_oPlaybackBtn.Text = "Play";
-            m_iPlaybackID = -1;
-
+            StopPlayback();
+           
             Task.Run(()=>
             {
                 try
@@ -624,7 +622,18 @@ namespace EyesonApp.Activities
             });
         }
 
-        private async void Login_Listener(EyesonApp.Models.Data data)
+        private void StopPlayback()
+        {
+            m_bStopPlayback = true;
+            if (!HCNetSDK.Instance.NET_DVR_StopPlayBack(m_iPlaybackID))
+            {
+                Log.Error("EYESON APP", "net sdk stop playback failed");
+            }
+            m_oPlaybackBtn.Text = "Play";
+            m_iPlaybackID = -1;
+        }
+
+        private void Login_Listener(EyesonApp.Models.Data data)
         {
             IsThereInternetOnDevice();
 
@@ -650,7 +659,7 @@ namespace EyesonApp.Activities
                         Console.WriteLine("m_iLogID=" + m_iLogID);
                     }
 
-                    Log.Info("", "Login sucess ****************************1***************************");
+                    Log.Info("", "Login sucess ********************************************************");
 
                     ShowFancyMessage(GetApplicationContext(), "Logged in successfully");
 
@@ -658,21 +667,6 @@ namespace EyesonApp.Activities
 
                     SaveLoginSessionSingleton.SaveUserLoggedSession(true);
 
-                    await Task.Delay(3000);
-
-                    ShowFancyMessage(GetApplicationContext(), "Starting Playback, please Wait", Duration:6000);
-
-                    //M_oPlaybackBtn_Click(null, null);
-                    //new System.Threading.Thread(new ThreadStart(()=>
-                    //{
-                    //    using (var h = new Handler(Looper.MainLooper)
-                    //    {
-                    //        h.Post(()=>
-                    //        {
-                    //            m_oPlaybackBtn.CallOnClick();
-                    //        });
-                    //    }
-                    //}));
                 }
                 else
                 {
@@ -749,7 +743,7 @@ namespace EyesonApp.Activities
                 return;
             }
 
-            Log.Info("", "NetSdk Play sucess ***********************3***************************");
+            Log.Info("", "NetSdk Play sucess ***************************************************");
             m_oPreviewBtn.Text = "Stop";
         }
 

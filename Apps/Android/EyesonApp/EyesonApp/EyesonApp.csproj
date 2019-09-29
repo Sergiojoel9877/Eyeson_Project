@@ -70,18 +70,18 @@
     <Reference Include="CookieBar2">
       <HintPath>..\..\..\..\Bindings\Android\CookieBar2\CookieBar2\bin\Debug\CookieBar2.dll</HintPath>
     </Reference>
-    <Reference Include="HCNetSDK">
-      <HintPath>..\..\..\..\Bindings\Android\HCNetSDK\HCNetSDK\bin\Debug\HCNetSDK.dll</HintPath>
-    </Reference>
-    <Reference Include="PlayerSDK">
-      <HintPath>..\..\..\..\Bindings\Android\PlayerSDK\PlayerSDK\bin\Debug\PlayerSDK.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Mono.Android" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
+    <Reference Include="HCNetSDK">
+      <HintPath>..\..\..\..\Bindings\Android\HCNetSDK\HCNetSDK\bin\Release\HCNetSDK.dll</HintPath>
+    </Reference>
+    <Reference Include="PlayerSDK">
+      <HintPath>..\..\..\..\Bindings\Android\PlayerSDK\PlayerSDK\bin\Release\PlayerSDK.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activities\MainActivity.cs" />
