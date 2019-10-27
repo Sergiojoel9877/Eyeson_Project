@@ -9,11 +9,11 @@
   <script>
 
 var postData = {
-      username: 'eyeson',
-      password: '2004eyeson',
-      ip: '50.78.124.78',
-      port: '8001',
-      camera: '5',
+      username: 'admin',
+      password: 'Eyeson123',
+      ip: '73.46.90.107',
+      port: '8800',
+      camera: '0',
       date: '2019-03-01T12:00:00.000Z'
 };
 
@@ -21,7 +21,7 @@ let headers = {
   'Content-Type': 'application/x-www-form-urlencoded'
 };
 
-axios.post('http://192.168.0.4:7555', postData, {"headers" : headers})
+axios.post('http://192.168.0.3:7555', postData, {"headers" : headers})
 
    .then((response) => {
             dispatch({type: FOUND_USER, data: response.data[0]})

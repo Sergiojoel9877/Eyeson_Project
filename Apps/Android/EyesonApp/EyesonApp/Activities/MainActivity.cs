@@ -1,5 +1,4 @@
 ﻿using Android.App;
-using Android.Content;
 using Android.Net.Wifi;
 using Android.OS;
 using Android.Runtime;
@@ -8,7 +7,6 @@ using Android.Support.V7.App;
 using Android.Text;
 using Android.Util;
 using Android.Views;
-using Android.Views.InputMethods;
 using Android.Widget;
 using Com.Hikvision.Netsdk;
 using EyesonApp.Controls;
@@ -35,8 +33,8 @@ namespace EyesonApp.Activities
         static Button m_oRecordBtn = null;
         static TextView m_IPAdrs = null;
         static SurfaceView m_surface = null;
-        static TimePicker timePicker;
-        static DatePicker datePicker;
+        static readonly TimePicker timePicker;
+        static readonly DatePicker datePicker;
         NET_DVR_DEVICEINFO_V30 m_oNetDvrDeviceInfoV30;
 
         delegate void LoginListenerDelegate(EyesonApp.Models.Data data);
@@ -52,21 +50,21 @@ namespace EyesonApp.Activities
         private static int m_iLogID = -1; // return by NET_DVR_Login_v30
         private static int m_iPlayID = -1; // return by NET_DVR_RealPlay_V30
         private static int m_iPlaybackID = -1; // return by NET_DVR_PlayBackByTime
-                 
-        private static int m_iPort = -1; // play port
-                 
-        private static bool m_bTalkOn = false;
-        private static bool m_bPTZL = false;
+
+        private static readonly int m_iPort = -1; // play port
+
+        private static readonly bool m_bTalkOn = false;
+        private static readonly bool m_bPTZL = false;
         private static bool m_bMultiPlay = false;
-                 
-        private static bool m_bNeedDecode = true;
+
+        private static readonly bool m_bNeedDecode = true;
         private static bool m_bSaveRealData = false;
         private static bool m_bStopPlayback = false;
 
         private static int Year { get; set; }
         private static int Month { get; set; }
         private static int Day { get; set; }
-                
+
         private static int Hour { get; set; }
         private static int Minute { get; set; }
         private static int Second { get; set; }
@@ -75,7 +73,7 @@ namespace EyesonApp.Activities
         private static int m_iChanNum { get; set; } = 0; // channel number
         public bool CanShowDateDialog { get; private set; }
 
-        private static PlaySurfaceView[] playView = new PlaySurfaceView[4];
+        private static readonly PlaySurfaceView[] playView = new PlaySurfaceView[4];
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -139,7 +137,8 @@ namespace EyesonApp.Activities
 
         private void StartSocketListening()
         {
-            new System.Threading.Thread(new ThreadStart(() => {
+            new System.Threading.Thread(new ThreadStart(() =>
+            {
                 AsynchronousSocketListener.StartListening();
             })).Start();
         }
@@ -153,7 +152,7 @@ namespace EyesonApp.Activities
             }
             else
             {
-                ShowFancyMessage(GetApplicationContext(), "No internet connection", Color:Resource.Color.error_color_material_light, Duration:3500);
+                ShowFancyMessage(GetApplicationContext(), "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
                 SetIPAddressToIPLabel();
                 StartSocketListening();
             }
@@ -170,15 +169,14 @@ namespace EyesonApp.Activities
             m_IPAdrs.Selected = true;
         }
 
-        private string GetIP()
-        {
-            WifiManager manager = (WifiManager)GetSystemService(Service.WifiService);
-            int ip = manager.ConnectionInfo.IpAddress;
+        //private string GetIP()
+        //{
+        //    WifiManager manager = (WifiManager)GetSystemService(Service.WifiService);
+        //    int ip = manager.ConnectionInfo.IpAddress;
 
-            string ipaddress = Android.Text.Format.Formatter.FormatIpAddress(ip);
-            return ipaddress;
-        }
-
+        //    string ipaddress = Android.Text.Format.Formatter.FormatIpAddress(ip);
+        //    return ipaddress;
+        //}
 
         public static async void SetDataToControls()
         {
@@ -230,7 +228,7 @@ namespace EyesonApp.Activities
 
         private void FabOnClick(object sender, EventArgs eventArgs)
         {
-            ShowFancyMessage(GetApplicationContext(), "Eyeson App Beta 1.0.0", Position: CookieBar.Bottom, Color:Resource.Color.material_blue_grey_800);
+            ShowFancyMessage(GetApplicationContext(), "Eyeson App Beta 1.0.0", Position: CookieBar.Bottom, Color: Resource.Color.material_blue_grey_800);
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
@@ -264,7 +262,7 @@ namespace EyesonApp.Activities
             if (!HCNetSDK.Instance.NET_DVR_Init())
             {
                 System.Console.WriteLine("HCNetSDK init is failed");
-                ShowFancyMessage(GetApplicationContext(), "The HCNetSDK has failed to init", Position:CookieBar.Top, Color: Resource.Color.material_blue_grey_800, Duration:1500);
+                ShowFancyMessage(GetApplicationContext(), "The HCNetSDK has failed to init", Position: CookieBar.Top, Color: Resource.Color.material_blue_grey_800, Duration: 1500);
                 return false;
             }
             HCNetSDK.Instance.NET_DVR_SetLogToFile(3, "/mnt/sdcard/sdklog/", true);
@@ -290,13 +288,16 @@ namespace EyesonApp.Activities
 
         private void Record_Listener(object sender, EventArgs e)
         {
-            IsThereInternetOnDevice();
+            if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.None || Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.Unknown)
+            {
+                ShowFancyMessage(GetApplicationContext(), "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
+                return;
+            }
 
             var random = new System.Random(12000);
-           
+
             if (!m_bSaveRealData)
             {
-               
                 // Documents folder
                 string documentsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyVideos) + $"_{random.Next(12000)}.mp4";
                 //string documentsPath = GetApplicationContext().GetExternalFilesDir($"_{random.Next(12000)}").AbsolutePath;
@@ -304,7 +305,7 @@ namespace EyesonApp.Activities
                 if (!HCNetSDK.Instance.NET_DVR_SaveRealData(m_iPlayID, documentsPath))
                 {
                     Console.WriteLine("NET_DVR_SaveRealData failed! error: " + HCNetSDK.Instance.NET_DVR_GetLastError());
-                    ShowFancyMessage(GetApplicationContext(), $"There's an error: Code: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to start saving the video", Position:CookieBar.Top, Color:Resource.Color.error_color_material_light, Duration: 23000);
+                    ShowFancyMessage(GetApplicationContext(), $"There's an error: Code: {HCNetSDK.Instance.NET_DVR_GetLastError()}", SwipeToDismissEnabled: true, message: "Try again, there was an error when trying to start saving the video", Position: CookieBar.Top, Color: Resource.Color.error_color_material_light, Duration: 23000);
                     return;
                 }
                 else
@@ -333,15 +334,6 @@ namespace EyesonApp.Activities
             }
         }
 
-        private void IsThereInternetOnDevice()
-        {
-            if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.None || Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.Unknown)
-            {
-                ShowFancyMessage(GetApplicationContext(), "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
-                return;
-            }
-        }
-
         private void SetListeners()
         {
             m_oPreviewBtn.Click += Preview_Listener;
@@ -364,7 +356,11 @@ namespace EyesonApp.Activities
 
         private void Capture_Listener(object sender, EventArgs e)
         {
-            IsThereInternetOnDevice();
+            if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.None || Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.Unknown)
+            {
+                ShowFancyMessage(GetApplicationContext(), "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
+                return;
+            }
 
             try
             {
@@ -382,7 +378,7 @@ namespace EyesonApp.Activities
                 if (!Player.Instance.GetPictureSize(port, stWidth, stHeight))
                 {
                     Log.Error("EYESON", "please start preview first");
-                    ShowFancyMessage(GetApplicationContext(), "Please start previewing first", Color:Resource.Color.error_color_material_light, Duration:2000);
+                    ShowFancyMessage(GetApplicationContext(), "Please start previewing first", Color: Resource.Color.error_color_material_light, Duration: 2000);
                     return;
                 }
 
@@ -405,7 +401,7 @@ namespace EyesonApp.Activities
                 file.Write(picBuf, 0, stSize.Value);
                 file.Close();
 
-            }   
+            }
             catch (System.Exception er)
             {
                 Log.Error("EYESON APP", "Error at: " + er.ToString());
@@ -416,7 +412,11 @@ namespace EyesonApp.Activities
         {
             StopPlayback();
 
-            ShowFancyMessage(GetApplicationContext(), "Starting Playback, please Wait", message: "Please wait....", Duration: 6000);
+            if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.None || Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.Unknown)
+            {
+                ShowFancyMessage(GetApplicationContext(), "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
+                return;
+            }
 
             try
             {
@@ -514,7 +514,7 @@ namespace EyesonApp.Activities
                         Log.Info("EYESON APP", "NET_DVR_PlayBackByTime failed, error code: " + HCNetSDK.Instance.NET_DVR_GetLastError());
                         var code = HCNetSDK.Instance.NET_DVR_GetLastError();
                         var msg = code == 10 ? "Connection Time out, try again" : "";
-                        ShowFancyMessage(GetApplicationContext(), "NET_DVR_PlayBackByTime failed, error code: " + code, message: msg, Color:Resource.Color.error_color_material_light, Duration:3000);
+                        ShowFancyMessage(GetApplicationContext(), "NET_DVR_PlayBackByTime failed, error code: " + code, message: msg, Color: Resource.Color.error_color_material_light, Duration: 3000);
                     }
                 }
                 else
@@ -533,17 +533,21 @@ namespace EyesonApp.Activities
 
         private void Preview_Listener(object sender, EventArgs e)
         {
-            IsThereInternetOnDevice();
+            if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.None || Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.Unknown)
+            {
+                ShowFancyMessage(GetApplicationContext(), "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
+                return;
+            }
 
             StopPlayback();
-           
-            Task.Run(()=>
+
+            Task.Run(() =>
             {
                 try
                 {
                     using (var h = new Handler(Looper.MainLooper))
                     {
-                        h.Post(()=>
+                        h.Post(() =>
                         {
                             ChangeSingleSurFace(false);
                         });
@@ -575,7 +579,7 @@ namespace EyesonApp.Activities
 
                                 using (var h = new Handler(Looper.MainLooper))
                                 {
-                                    h.Post(()=>
+                                    h.Post(() =>
                                     {
                                         m_oPreviewBtn.Text = "Stop";
                                     });
@@ -635,13 +639,17 @@ namespace EyesonApp.Activities
 
         private void Login_Listener(EyesonApp.Models.Data data)
         {
-            IsThereInternetOnDevice();
+            if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.None || Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.Unknown)
+            {
+                ShowFancyMessage(GetApplicationContext(), "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
+                return;
+            }
 
             try
             {
                 if (data.Ip.Trim().Length == 0 || data.Port <= 0 || data.Username.Trim().Length == 0 || data.Password.Trim().Length == 0)
                 {
-                    ShowFancyMessage(main, "Fill every field", Color:Resource.Color.error_color_material_light);
+                    ShowFancyMessage(main, "Fill every field", Color: Resource.Color.error_color_material_light);
                     return;
                 }
                 if (m_iLogID < 0)
@@ -651,7 +659,7 @@ namespace EyesonApp.Activities
                     if (m_iLogID < 0)
                     {
                         Console.WriteLine("This device logins failed!");
-                        ShowFancyMessage(GetApplicationContext(), "Login failed, try again", Position:CookieBar.Top, Color:Resource.Color.error_color_material_light);
+                        ShowFancyMessage(GetApplicationContext(), "Login failed, try again", Position: CookieBar.Top, Color: Resource.Color.error_color_material_light);
                         return;
                     }
                     else
@@ -710,7 +718,7 @@ namespace EyesonApp.Activities
             {
                 Log.Error("", "StopRealPlay is failed!Err:"
                         + HCNetSDK.Instance.NET_DVR_GetLastError());
-                ShowFancyMessage(GetApplicationContext(), "StopRealPlay failed", Color:Resource.Color.error_color_material_light, Duration: 23000);
+                ShowFancyMessage(GetApplicationContext(), "StopRealPlay failed", Color: Resource.Color.error_color_material_light, Duration: 23000);
                 return;
             }
 
@@ -857,7 +865,7 @@ namespace EyesonApp.Activities
                         @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
                         @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
                     }
-                   
+
                     playView[0].LayoutParameters = @params;
 
                     GetApplicationContext().AddContentView(playView[i], @params);
@@ -931,17 +939,17 @@ namespace EyesonApp.Activities
 
         public void FExceptionCallBack(int p0, int p1, int p2)
         {
-     
+
         }
 
         public void AfterTextChanged(IEditable s)
         {
-           
+
         }
 
         public void BeforeTextChanged(ICharSequence s, int start, int count, int after)
         {
-  
+
         }
 
         public void OnTextChanged(ICharSequence s, int start, int before, int count)
