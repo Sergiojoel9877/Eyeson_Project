@@ -189,7 +189,7 @@ namespace EyesonApp.Activities
                 ParseDate(_result.Date);
                 InvokeLoginListener(_result);
             }
-            await Task.Delay(100);
+            await Task.Delay(1000);
 
             InvokePlaybackListener(null, null);
         }
