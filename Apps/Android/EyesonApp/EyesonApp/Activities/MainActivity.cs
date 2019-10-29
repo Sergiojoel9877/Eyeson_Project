@@ -165,7 +165,7 @@ namespace EyesonApp.Activities
             var IP = "127.0.0.1";
             //var emptyIp = IP == "127.0.0.1" ? true : false;
             //var message = emptyIp == false ? " " + IP + " listening on Port 7555" : " " + IP + " there's a network issue";
-            var message = IP + " listening on Port 7555";
+            var message = IP + " listening on Port 3200";
             m_IPAdrs.Text = message;
             m_IPAdrs.Selected = true;
         }
