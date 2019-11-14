@@ -33,9 +33,9 @@ namespace EyesonApp.Services
             // Establish the local endpoint for the socket.  
             // The DNS name of the computer  
             // running the listener is "host.contoso.com".  
-            IPHostEntry ipHostInfo = Dns.GetHostEntry("127.0.0.1");
+            IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
             IPAddress ipAddress = ipHostInfo.AddressList[0];
-            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 3200);
+            IPEndPoint localEndPoint = new IPEndPoint(ipAddress, 5554);
 
             // Create a TCP/IP socket.  
             Socket listener = new Socket(ipAddress.AddressFamily,
@@ -131,12 +131,16 @@ namespace EyesonApp.Services
 
                 memoryStream.Close();
 
+                /*object locker = new object();
+
+                lock (locker)
+                {
+                   
+                }*/
+
                 using (var h = new Handler(Looper.MainLooper))
                 {
-                    h.Post(() =>
-                    {
-                        MainActivity.SetDataToControls();
-                    });
+                    h.Post(MainActivity.SetDataToControls);
                 }
 
                 //Echo the data back to the client.

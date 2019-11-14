@@ -45,6 +45,9 @@ namespace EyesonApp.Activities
         delegate void PlaybackListenerDelegate(object obj, EventArgs E);
         static PlaybackListenerDelegate _PlaybackListenerDelegate;
 
+        delegate void StopPlaybackDelegate();
+        static StopPlaybackDelegate _StopPlaybackDelegate;
+
         static MainActivity main { get; set; }
 
         public static MainActivity MContext { get; set; }
@@ -180,18 +183,45 @@ namespace EyesonApp.Activities
         }
 
 
-        public static async void SetDataToControls()
+        public static void SetDataToControls()
         {
+            object locker = new object();
             var _result = DataSingleton.Instance();
 
             if (!SaveLoginSessionSingleton.SessionLoggedIn())
             {
                 ParseDate(_result.Date);
-                InvokeLoginListener(_result);
-            }
-            await Task.Delay(1000);
+                lock (locker)
+                {
+                    InvokeStopPlaybackDelegate();
 
-            InvokePlaybackListener(null, null);
+                    using (var h = new Handler(Looper.MainLooper))
+                    {
+                        h.Post(() => InvokePlaybackListener(null, null));
+                    }
+                    InvokeLoginListener(_result);
+
+                    //InvokePlaybackListener(null, null);
+                }
+                /*using (var h = new Handler(Looper.MainLooper))
+                {
+                    h.Post(() => InvokePlaybackListener(null, null));
+                }*/
+            }
+            else
+            {
+                lock (locker)
+                {
+                    InvokePlaybackListener(null, null);
+                }
+            }
+        }
+
+        private static void InvokeStopPlaybackDelegate()
+        {
+            main = new MainActivity();
+            MainActivity._StopPlaybackDelegate = main.StopPlayback;
+            MainActivity._StopPlaybackDelegate?.Invoke();
         }
 
         private static void InvokePlaybackListener(object obj, EventArgs e)
@@ -290,7 +320,8 @@ namespace EyesonApp.Activities
 
         private void Record_Listener(object sender, EventArgs e)
         {
-            IsThereInternetOnDevice();
+            if (!IsThereInternetOnDevice())
+                return;
 
             var random = new System.Random(12000);
            
@@ -333,13 +364,14 @@ namespace EyesonApp.Activities
             }
         }
 
-        private void IsThereInternetOnDevice()
+        private bool IsThereInternetOnDevice()
         {
             if (Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.None || Xamarin.Essentials.Connectivity.NetworkAccess == Xamarin.Essentials.NetworkAccess.Unknown)
             {
                 ShowFancyMessage(GetApplicationContext(), "No internet connection", Color: Resource.Color.error_color_material_light, Duration: 3500);
-                return;
+                return false;
             }
+            return true;
         }
 
         private void SetListeners()
@@ -352,19 +384,24 @@ namespace EyesonApp.Activities
 
         private void PlaybackButtomCliked(object sender, EventArgs e)
         {
+            object locker = new object();
             if (m_oPlaybackBtn.Text == "Stop")
             {
                 StopPlayback();
             }
             else
             {
-                InvokePlaybackListener(null, null);
+                lock (locker)
+                {
+                    InvokePlaybackListener(null, null);
+                }
             }
         }
 
         private void Capture_Listener(object sender, EventArgs e)
         {
-            IsThereInternetOnDevice();
+            if (!IsThereInternetOnDevice())
+                return;
 
             try
             {
@@ -503,7 +540,6 @@ namespace EyesonApp.Activities
                                 }
                                 catch (InterruptedException er)
                                 {
-                                    // TODO Auto-generated catch block
                                     er.PrintStackTrace();
                                 }
                             }
@@ -533,7 +569,8 @@ namespace EyesonApp.Activities
 
         private void Preview_Listener(object sender, EventArgs e)
         {
-            IsThereInternetOnDevice();
+            if (IsThereInternetOnDevice())
+                return;
 
             StopPlayback();
            
@@ -635,7 +672,10 @@ namespace EyesonApp.Activities
 
         private void Login_Listener(EyesonApp.Models.Data data)
         {
-            IsThereInternetOnDevice();
+            if (!IsThereInternetOnDevice())
+                return;
+
+            //object locker = new object();
 
             try
             {
@@ -667,6 +707,10 @@ namespace EyesonApp.Activities
 
                     SaveLoginSessionSingleton.SaveUserLoggedSession(true);
 
+                    /*lock (locker)
+                    {
+                    }*/
+                    InvokePlaybackListener(null, null);
                 }
                 else
                 {
@@ -813,24 +857,25 @@ namespace EyesonApp.Activities
                     + m_oNetDvrDeviceInfoV30.byHighDChanNum * 256*/;
             }
 
-            if (m_iChanNum > 1)
+            /*if (m_iChanNum > 1)
             {
                 ChangeSingleSurFace(false);
             }
             else
             {
                 ChangeSingleSurFace(true);
-            }
+            }*/
 
             Log.Info("", "NET_DVR_Login is Successful!");
 
             return iLogID;
         }
 
+        //TODO Tablet devices Support..
         private void ChangeSingleSurFace(bool bSingle)
         {
-
             var surfaceOrientation = GetApplicationContext().WindowManager.DefaultDisplay.Rotation;
+            bool IsTabletDevice = DeviceInfo.Idiom == DeviceIdiom.Tablet ? true : false;
 
             for (int i = 0; i < 4; i++)
             {
@@ -839,30 +884,46 @@ namespace EyesonApp.Activities
                     playView[i] = new PlaySurfaceView(GetApplicationContext().ApplicationContext);
                     playView[i].SetParam(m_surface.Width);
 
-                    FrameLayout.LayoutParams @params;
+                    #region PhoneResolution..
 
-                    if (surfaceOrientation == SurfaceOrientation.Rotation0 || surfaceOrientation == SurfaceOrientation.Rotation180)
+                    FrameLayout.LayoutParams @params = null;
+
+                    if (!IsTabletDevice)
                     {
-                        @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+                        if (surfaceOrientation == SurfaceOrientation.Rotation0 || surfaceOrientation == SurfaceOrientation.Rotation180)
+                        {
+                            DefineParams(out @params, i);
+                        }
+                        else
+                        {
+                            @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                        @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.35f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(m_surface.Width * 0.24f);
-                        @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
-                        @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                            @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.1f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(m_surface.Width * 0.1f);
+                            @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
+                            @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                        }
                     }
-                    else
-                    {
-                        @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                        @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.1f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(m_surface.Width * 0.1f);
-                        @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
-                        @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
-                    }
-                   
+                    #endregion EndPhoneResolutuon..
+
+                    #region TabletResolution..
+
+                    #endregion TabletResolution..
+
                     playView[0].LayoutParameters = @params;
 
                     GetApplicationContext().AddContentView(playView[i], @params);
                     playView[i].Visibility = ViewStates.Invisible;
                 }
+            }
+
+            void DefineParams(out FrameLayout.LayoutParams @params, int i)
+            {
+                @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+
+                @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.35f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(m_surface.Width * 0.24f);
+                @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
+                @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
             }
 
             if (bSingle)
@@ -927,6 +988,7 @@ namespace EyesonApp.Activities
 
                 playView[0].LayoutParameters = @params;
             }
+
         }
 
         public void FExceptionCallBack(int p0, int p1, int p2)
