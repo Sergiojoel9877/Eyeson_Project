@@ -148,13 +148,13 @@ namespace EyesonApp.Activities
         {
             if (e.NetworkAccess == Xamarin.Essentials.NetworkAccess.Internet)
             {
-                SetIPAddressToIPLabel();
+                //SetIPAddressToIPLabel();
                 StartSocketListening();
             }
             else
             {
                 ShowFancyMessage(GetApplicationContext(), "No internet connection", Color:Resource.Color.error_color_material_light, Duration:3500);
-                SetIPAddressToIPLabel();
+                //SetIPAddressToIPLabel();
                 StartSocketListening();
             }
         }
