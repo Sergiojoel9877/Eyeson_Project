@@ -569,7 +569,7 @@ namespace EyesonApp.Activities
 
         private void Preview_Listener(object sender, EventArgs e)
         {
-            if (IsThereInternetOnDevice())
+            if (!IsThereInternetOnDevice())
                 return;
 
             StopPlayback();
