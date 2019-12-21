@@ -1249,43 +1249,89 @@ namespace EyesonApp
         //TODO Tablet devices Support..
         private void ChangeSingleSurFace(bool bSingle)
         {
-            var surfaceOrientation = GetApplicationContext().WindowManager.DefaultDisplay.Rotation;
             bool IsTabletDevice = DeviceInfo.Idiom == DeviceIdiom.Tablet ? true : false;
+            var DisplayMetrics = new DisplayMetrics();
+            GetApplicationContext().WindowManager.DefaultDisplay.GetMetrics(DisplayMetrics);
+
+            void SetParamsForButtonsOnMultiViewMode(int i)
+            {
+                ConstraintLayout.LayoutParams _params = (ConstraintLayout.LayoutParams)m_oPlaybackBtn.LayoutParameters;
+                _params.SetMargins(8, Convert.ToInt32(DisplayMetrics.WidthPixels + DisplayMetrics.WidthPixels * 0.5f), 8, 8);
+                m_oPlaybackBtn.LayoutParameters = _params;
+
+                ConstraintLayout.LayoutParams __params = (ConstraintLayout.LayoutParams)m_oCaptureBtn.LayoutParameters;
+                __params.SetMargins(8, Convert.ToInt32(DisplayMetrics.WidthPixels + DisplayMetrics.WidthPixels * 0.5f), 8, 8);
+                m_oCaptureBtn.LayoutParameters = __params;
+
+                ConstraintLayout.LayoutParams ___params = (ConstraintLayout.LayoutParams)m_oRecordBtn.LayoutParameters;
+                ___params.SetMargins(8, Convert.ToInt32(DisplayMetrics.WidthPixels + DisplayMetrics.WidthPixels * 0.5f), 8, 8);
+                m_oRecordBtn.LayoutParameters = ___params;
+
+                ConstraintLayout.LayoutParams ____params = (ConstraintLayout.LayoutParams)m_oPreviewBtn.LayoutParameters;
+                ____params.SetMargins(8, Convert.ToInt32(DisplayMetrics.WidthPixels + DisplayMetrics.WidthPixels * 0.5f), 8, 8);
+                m_oPreviewBtn.LayoutParameters = ____params;
+            }
+
+            var iteration_gen = 0;
 
             for (int i = 0; i < 4; i++)
             {
                 if (playView[i] == null)
                 {
                     playView[i] = new PlaySurfaceView(GetApplicationContext().ApplicationContext);
-                    playView[i].SetParam(m_surface.Width);
-
+                   
                     #region PhoneResolution..
 
                     FrameLayout.LayoutParams @params = null;
 
                     if (!IsTabletDevice)
                     {
-                        if (surfaceOrientation == SurfaceOrientation.Rotation0 || surfaceOrientation == SurfaceOrientation.Rotation180)
+                        playView[i].SetParam(DisplayMetrics.WidthPixels);
+                        DefineParams(out @params, i);
+                        SetParamsForButtonsOnMultiViewMode(i);
+                    }
+                    else
+                    {
+                        iteration_gen++;
+                        switch (iteration_gen)
                         {
-                            DefineParams(out @params, i);
+                            case 1:
+                                playView[i].SetParam(Convert.ToInt32(DisplayMetrics.WidthPixels - DisplayMetrics.WidthPixels * 0.2f));
+                                @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+                                @params.TopMargin = Convert.ToInt32(playView[i].M_iWidth + playView[i].M_iWidth * 0.2f);
+                                @params.LeftMargin = Convert.ToInt32((DisplayMetrics.WidthPixels * 0.1f));
+                                @params.RightMargin = 0;
+                                break;
+                            case 2:
+                                playView[i].SetParam(Convert.ToInt32(DisplayMetrics.WidthPixels - DisplayMetrics.WidthPixels * 0.2f));
+                                @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+                                @params.TopMargin = Convert.ToInt32(playView[i].M_iWidth + playView[i].M_iWidth * 0.2f);
+                                @params.RightMargin = Convert.ToInt32(DisplayMetrics.WidthPixels * 0.1f);
+                                @params.LeftMargin = Convert.ToInt32(playView[i].M_iWidth + DisplayMetrics.WidthPixels * 0.1f);
+                                break;
+                            case 3:
+                                playView[i].SetParam(Convert.ToInt32(DisplayMetrics.WidthPixels - DisplayMetrics.WidthPixels * 0.2f));
+                                @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+                                @params.TopMargin = 0;
+                                @params.RightMargin = 0;
+                                @params.LeftMargin = Convert.ToInt32((DisplayMetrics.WidthPixels * 0.1f));
+                                break;
+                            case 4:
+                                playView[i].SetParam(Convert.ToInt32(DisplayMetrics.WidthPixels - DisplayMetrics.WidthPixels * 0.2f));
+                                @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+                                @params.RightMargin = Convert.ToInt32(playView[i].M_iWidth + DisplayMetrics.WidthPixels * 0.1f);
+                                @params.TopMargin = 0;
+                                @params.LeftMargin = Convert.ToInt32(playView[i].M_iWidth + DisplayMetrics.WidthPixels * 0.1f);
+                                break;
                         }
-                        else
-                        {
-                            @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                            @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.1f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(m_surface.Width * 0.1f);
-                            @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
-                            @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
-                        }
+                        @params.BottomMargin = Convert.ToInt32(DisplayMetrics.WidthPixels * 0.35f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iHeight + Convert.ToInt32(DisplayMetrics.WidthPixels * 0.1f);
+                        @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+
+                        //SetParamsForButtonsOnMultiViewMode(i);
                     }
 
-                    #endregion EndPhoneResolutuon..
-
-                    #region TabletResolution..
-
                     #endregion TabletResolution..
-
-                    playView[0].LayoutParameters = @params;
 
                     GetApplicationContext().AddContentView(playView[i], @params);
                     playView[i].Visibility = ViewStates.Invisible;
@@ -1296,37 +1342,60 @@ namespace EyesonApp
             {
                 @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
 
-                @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.35f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(m_surface.Width * 0.24f);
+                @params.BottomMargin = Convert.ToInt32(DisplayMetrics.WidthPixels * 0.35f) + playView[i].M_iHeight - (i / 2) * playView[i].M_iWidth + Convert.ToInt32(DisplayMetrics.WidthPixels * 0.24f);
                 @params.LeftMargin = (i % 2) * playView[i].M_iWidth;
                 @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
             }
 
+            void SetParamsForButtons()
+            {
+                ConstraintLayout.LayoutParams _params = (ConstraintLayout.LayoutParams)m_oPlaybackBtn.LayoutParameters;
+                _params.SetMargins(8, Convert.ToInt32(playView[3].M_iHeight * 0.3f), 8, 8);
+                m_oPlaybackBtn.LayoutParameters = _params;
+
+                ConstraintLayout.LayoutParams __params = (ConstraintLayout.LayoutParams)m_oCaptureBtn.LayoutParameters;
+                __params.SetMargins(8, Convert.ToInt32(playView[3].M_iHeight * 0.3f), 8, 8);
+                m_oCaptureBtn.LayoutParameters = __params;
+
+                ConstraintLayout.LayoutParams ___params = (ConstraintLayout.LayoutParams)m_oRecordBtn.LayoutParameters;
+                ___params.SetMargins(8, Convert.ToInt32(playView[3].M_iHeight * 0.3f), 8, 8);
+                m_oRecordBtn.LayoutParameters = ___params;
+
+                ConstraintLayout.LayoutParams ____params = (ConstraintLayout.LayoutParams)m_oPreviewBtn.LayoutParameters;
+                ____params.SetMargins(8, Convert.ToInt32(playView[3].M_iHeight * 0.3f), 8, 8);
+                m_oPreviewBtn.LayoutParameters = ____params;
+
+                ScrollScrollViewToTheBottom();
+            }
+
             if (bSingle)
             {
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; ++i)
                 {
                     playView[i].Visibility = ViewStates.Invisible;
                 }
 
-                playView[0].SetParam(m_surface.Width * 2);
-
                 FrameLayout.LayoutParams @params;
 
-                if (surfaceOrientation == SurfaceOrientation.Rotation0 || surfaceOrientation == SurfaceOrientation.Rotation180)
+                if (!IsTabletDevice)
                 {
-                    @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+                    playView[0].SetParam(DisplayMetrics.WidthPixels * 2);
 
-                    @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.35f) + playView[3].M_iHeight - (2 / 2) * playView[3].M_iHeight + Convert.ToInt32(m_surface.Width * 0.24f);
+                    @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+                    @params.BottomMargin = Convert.ToInt32(DisplayMetrics.WidthPixels * 0.35f) + playView[3].M_iHeight - (3 / 2) * playView[3].M_iHeight + Convert.ToInt32(DisplayMetrics.WidthPixels * 0.24f);
                     @params.LeftMargin = 0;
                     @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                    SetParamsForButtons();
                 }
                 else
                 {
+                    playView[0].SetParam(Convert.ToInt32(DisplayMetrics.WidthPixels + DisplayMetrics.WidthPixels * 0.2f));
                     @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
+                    @params.TopMargin = Convert.ToInt32(DisplayMetrics.WidthPixels * 0.2f);
+                    @params.BottomMargin = Convert.ToInt32(DisplayMetrics.WidthPixels * 0.1f) + playView[3].M_iHeight - (3 / 2) * playView[3].M_iHeight + Convert.ToInt32(DisplayMetrics.WidthPixels * 0.1f);
+                    @params.Gravity = GravityFlags.Top | GravityFlags.Center;
 
-                    @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.1f) + playView[3].M_iHeight - (2 / 2) * playView[3].M_iHeight + Convert.ToInt32(m_surface.Width * 0.1f);
-                    @params.LeftMargin = 0;
-                    @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                    SetParamsForButtons();
                 }
 
                 playView[0].LayoutParameters = @params;
@@ -1335,35 +1404,40 @@ namespace EyesonApp
             }
             else
             {
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < 4; ++i)
                 {
                     playView[i].Visibility = ViewStates.Visible;
                 }
 
-                playView[0].SetParam(m_surface.Width);
+                playView[0].SetParam(DisplayMetrics.WidthPixels);
 
                 FrameLayout.LayoutParams @params;
 
-                if (surfaceOrientation == SurfaceOrientation.Rotation0 || surfaceOrientation == SurfaceOrientation.Rotation180)
+                if (!IsTabletDevice)
                 {
                     @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
-
-                    @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.35f) + playView[0].M_iHeight - (0 / 4) * playView[0].M_iHeight + Convert.ToInt32(m_surface.Width * 0.24f);
+                    @params.BottomMargin = Convert.ToInt32(DisplayMetrics.WidthPixels * 0.35f) + playView[0].M_iHeight - (0 / 2) * playView[0].M_iHeight + Convert.ToInt32(DisplayMetrics.WidthPixels * 0.24f);
                     @params.LeftMargin = (0 % 2) * playView[0].M_iWidth;
                     @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+                    SetParamsForButtons();
                 }
                 else
                 {
+                    playView[0].SetParam(Convert.ToInt32(DisplayMetrics.WidthPixels - DisplayMetrics.WidthPixels * 0.2f));
                     @params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WrapContent, FrameLayout.LayoutParams.WrapContent);
-
-                    @params.BottomMargin = Convert.ToInt32(m_surface.Width * 0.1f) + playView[0].M_iHeight - (0 / 4) * playView[0].M_iHeight + Convert.ToInt32(m_surface.Width * 0.1f);
-                    @params.LeftMargin = (0 % 2) * playView[0].M_iWidth;
+                    @params.TopMargin = Convert.ToInt32(playView[0].M_iWidth + playView[0].M_iWidth * 0.2f);
+                    @params.LeftMargin = Convert.ToInt32((DisplayMetrics.WidthPixels * 0.1f));
+                    @params.RightMargin = 0;
+                    @params.BottomMargin = Convert.ToInt32(DisplayMetrics.WidthPixels * 0.35f) + playView[0].M_iHeight - (0 / 2) * playView[0].M_iHeight + Convert.ToInt32(DisplayMetrics.WidthPixels * 0.1f);
                     @params.Gravity = GravityFlags.Bottom | GravityFlags.Left;
+
+                    SetParamsForButtons();
                 }
 
                 playView[0].LayoutParameters = @params;
-            }
 
+                SetParamsForButtonsOnMultiViewMode(0);
+            }
         }
 
         public void FExceptionCallBack(int p0, int p1, int p2)
