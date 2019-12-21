@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintLayout"
+    android:background="@android:color/black"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -17,11 +18,11 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
 
-        <android.support.constraint.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+		<android.support.constraint.ConstraintLayout
+			android:layout_width="match_parent"
+			android:layout_height="match_parent">
 
-            <SurfaceView
+			 <SurfaceView
                 android:id="@+id/Sur_Player"
                 android:layout_width="0dp"
                 android:layout_height="360dp"
@@ -32,76 +33,62 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
-                android:id="@+id/btn_Preview"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:background="@mipmap/buttons_cornerRadius"
-                android:text="Preview"
-                android:textColor="#fff"
-                android:textStyle="bold"
-                android:typeface="sans"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/Sur_Player" />
-
-            <Button
+             <Button
                 android:id="@+id/btn_Playback"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
                 android:background="@mipmap/buttons_cornerRadius"
                 android:text="Play"
                 android:textColor="#fff"
                 android:textStyle="bold"
                 android:typeface="sans"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btn_Capture"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/Sur_Player" />
+                app:layout_constraintTop_toBottomOf="@+id/ipPlaceHolder"
+                app:layout_constraintVertical_bias="0.6" />
 
             <Button
                 android:id="@+id/btn_Capture"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginLeft="16dp"
                 android:background="@mipmap/buttons_cornerRadius"
                 android:text="Capture"
                 android:textColor="#fff"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/btn_Record"
-                app:layout_constraintTop_toBottomOf="@+id/Sur_Player"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintTop_toBottomOf="@+id/ipPlaceHolder"
+                app:layout_constraintVertical_bias="0.6" />
 
             <Button
                 android:id="@+id/btn_Record"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginStart="8dp"
                 android:background="@mipmap/buttons_cornerRadius"
                 android:text="Record"
                 android:textColor="#fff"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toTopOf="@+id/ipPlaceHolder"
                 app:layout_constraintEnd_toStartOf="@+id/btn_Preview"
-                app:layout_constraintTop_toBottomOf="@+id/Sur_Player"
-                app:layout_constraintVertical_bias="0.0" />
+                app:layout_constraintTop_toBottomOf="@+id/ipPlaceHolder" />
 
             <TextView
                 android:id="@+id/ipPlaceHolder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="40dp"
-                android:layout_marginEnd="8dp"
-                android:visibility="invisible"
+                android:layout_marginTop="68dp"
                 android:ellipsize="marquee"
                 android:fadingEdge="horizontal"
                 android:focusable="true"
@@ -112,11 +99,29 @@
                 android:text=""
                 android:textSize="30sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btn_Capture" />
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/Sur_Player"
+                tools:layout_editor_absoluteX="0dp" />
 
-        </android.support.constraint.ConstraintLayout>
+            <Button
+                android:id="@+id/btn_Preview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="16dp"
+                android:layout_marginStart="8dp"
+                android:background="@mipmap/buttons_cornerRadius"
+                android:text="Preview"
+                android:textColor="#fff"
+                android:textStyle="bold"
+                android:typeface="sans"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/ipPlaceHolder"
+                app:layout_constraintVertical_bias="0.0" />
+
+		</android.support.constraint.ConstraintLayout>
     </ScrollView>
 </android.support.constraint.ConstraintLayout>
