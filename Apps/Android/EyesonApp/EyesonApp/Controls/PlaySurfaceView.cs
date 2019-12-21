@@ -12,7 +12,6 @@ using Android.Views;
 using Android.Widget;
 using Com.Hikvision.Netsdk;
 using EyesonApp;
-using EyesonApp.Activities;
 
 namespace EyesonApp.Controls
 {
@@ -40,8 +39,8 @@ namespace EyesonApp.Controls
 
         public void SurfaceChanged(ISurfaceHolder holder, [GeneratedEnum] Format format, int width, int height)
         {
-            SetZOrderOnTop(true);
-            Holder.SetFormat(Format.Translucent);
+            SetZOrderOnTop(false);
+            Holder.SetFormat(Format.Jpeg);
             Console.WriteLine("SurfaceChanged");
         }
 
@@ -65,7 +64,7 @@ namespace EyesonApp.Controls
         public void SetParam(int NScreenSize)
         {
             M_iWidth = NScreenSize / 2;
-            M_iHeight = (M_iWidth * 4) / 4;
+            M_iHeight = (M_iWidth * 3) / 4;
         }
 
         public void StartPreview(int IUserID, int IChan)
