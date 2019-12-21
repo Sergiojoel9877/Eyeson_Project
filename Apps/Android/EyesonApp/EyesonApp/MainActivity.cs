@@ -1,8 +1,10 @@
 ﻿using Android.App;
 using Android.Content;
+using Android.Content.Res;
 using Android.Net.Wifi;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.Constraints;
 using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Text;
