@@ -8,17 +8,18 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using EyesonApp.Activities;
 using Newtonsoft.Json;
 
 namespace EyesonApp.Services
 {
+    [Preserve(AllMembers = true)]
     public class AsynchronousSocketListener
     {
         //Thread signal
