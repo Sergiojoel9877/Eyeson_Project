@@ -25,10 +25,10 @@ using Xamarin.Essentials;
 using AlertDialog = Android.Support.V7.App.AlertDialog;
 using Console = System.Console;
 
-namespace EyesonApp.Activities
+namespace EyesonApp
 {
     [Preserve(AllMembers = true)]
-    [Activity(Label = "@string/app_name", Theme = "@style/ThemeSplash", MainLauncher = true, LaunchMode = Android.Content.PM.LaunchMode.SingleInstance, ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
+    [Activity(Label = "@string/app_name", Theme = "@style/ThemeSplash", MainLauncher = true, LaunchMode = Android.Content.PM.LaunchMode.SingleInstance, ScreenOrientation = Android.Content.PM.ScreenOrientation.Portrait, ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
     public class MainActivity : AppCompatActivity, IExceptionCallBack, ITextWatcher
     {
         static Button m_oPreviewBtn = null;
