@@ -133,13 +133,6 @@ namespace EyesonApp.Services
 
                 memoryStream.Close();
 
-                /*object locker = new object();
-
-                lock (locker)
-                {
-                   
-                }*/
-
                 using (var h = new Handler(Looper.MainLooper))
                 {
                     h.Post(MainActivity.SetDataToControls);
