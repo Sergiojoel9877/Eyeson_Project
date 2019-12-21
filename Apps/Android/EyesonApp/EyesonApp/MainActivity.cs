@@ -38,9 +38,10 @@ namespace EyesonApp
         static Button m_oCaptureBtn = null;
         static Button m_oRecordBtn = null;
         static TextView m_IPAdrs = null;
-        static SurfaceView m_surface = null;
+        static SurfaceView m_surface;
         static TimePicker timePicker;
         static DatePicker datePicker;
+        static ScrollView scrollView = null;
         NET_DVR_DEVICEINFO_V30 m_oNetDvrDeviceInfoV30;
 
         delegate void LoginListenerDelegate(EyesonApp.Models.Data data);
