@@ -32,5 +32,8 @@ namespace EyesonApp.Models
 
         [JsonProperty("date")]
         public DateTimeOffset Date { get; set; }
+
+        [JsonIgnore]
+        public bool DisableOnResumeRendering { get; set; }
     }
 }
