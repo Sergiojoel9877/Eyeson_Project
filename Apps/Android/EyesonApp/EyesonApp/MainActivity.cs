@@ -59,12 +59,12 @@ namespace EyesonApp
         delegate void PreviewListenerDelegate(object obj, EventArgs e);
         static PreviewListenerDelegate _PreviewListenerDelegate;
 
-        delegate void LaunchAppFromBackgroundDelegate(Context context);
+        delegate void LaunchAppFromBackgroundDelegate(Activity context);
         static LaunchAppFromBackgroundDelegate _LaunchAppFromBackgroundDelegate;
 
         static MainActivity main { get; set; }
 
-        public static MainActivity MContext { get; set; }
+        public static Activity MContext { get; set; }
 
         private static int m_iLogID = -1; // return by NET_DVR_Login_v30
         private static int m_iPlayID = -1; // return by NET_DVR_RealPlay_V30
@@ -263,23 +263,15 @@ namespace EyesonApp
             }
         }
         
-        public void LaunchApp(Context context)
+        public void LaunchApp(Activity context)
         {
-            //Intent intent = new Intent(context, typeof(MainActivity));
-            //Intent intent = new Intent("com.EyesonDigital.VMControlCenter");
+            var intent = new Intent(context, typeof(MainActivity));
+            var pendingIntent = PendingIntent.GetActivity(context, 0, intent, PendingIntentFlags.UpdateCurrent);
 
-            ////intent.SetClassName("com.EyesonDigital.VMControlCenter", "com.EyesonDigital.VMControlCenter.Activities.MainActivity");
-            ////intent.SetClassName(context, typeof(MainActivity).AssemblyQualifiedName);
-            //intent.SetFlags(ActivityFlags.NewTask | ActivityFlags.ClearTop);
-            //context.StartActivity(intent);
+            var mgr = (AlarmManager)context.GetSystemService(Context.AlarmService);
+            mgr.Set(AlarmType.Rtc, 5, pendingIntent);
 
-            //Intent intent = new Intent(context, typeof(MainActivity));
-            Intent intent = new Intent();
-            intent.AddFlags(ActivityFlags.NewTask | ActivityFlags.ClearTop | ActivityFlags.FromBackground); // You need this if starting the activity from a service
-            intent.SetClassName(context, "com.EyesonDigital.VMControlCenter.Activities.MainActivity");
-            //intent.SetAction("com.EyesonDigital.VMControlCenter");
-            intent.AddCategory("android.intent.category.DEFAULT");
-            context.StartActivity(intent);
+            AllowedToStream = false;
         }
 
         private static void InvokeStopPlaybackDelegate()
@@ -317,7 +309,7 @@ namespace EyesonApp
             MainActivity._PreviewListenerDelegate?.Invoke(null, null);
         }
 
-        private static void InvokeAppLaunch(Context context)
+        private static void InvokeAppLaunch(Activity context)
         {
             main = new MainActivity();
             MainActivity._LaunchAppFromBackgroundDelegate = main.LaunchApp;
