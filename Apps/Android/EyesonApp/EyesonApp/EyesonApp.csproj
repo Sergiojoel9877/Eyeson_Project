@@ -35,7 +35,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AndroidUseSharedRuntime>true</AndroidUseSharedRuntime>
     <EmbedAssembliesIntoApk>false</EmbedAssembliesIntoApk>
     <AndroidDexTool>d8</AndroidDexTool>
     <AndroidLinkTool>r8</AndroidLinkTool>
@@ -47,24 +46,27 @@
     <MandroidI18n />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>PdbOnly</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <DebugType></DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AndroidManagedSymbols>true</AndroidManagedSymbols>
-    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
-    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
     <JavaMaximumHeapSize>1G</JavaMaximumHeapSize>
     <AndroidDexTool>d8</AndroidDexTool>
     <AndroidExplicitCrunch>true</AndroidExplicitCrunch>
     <AndroidEnableDesugar>true</AndroidEnableDesugar>
+    <EnableLLVM>True</EnableLLVM>
     <AndroidLinkTool>r8</AndroidLinkTool>
     <AndroidCreatePackagePerAbi>true</AndroidCreatePackagePerAbi>
     <AotAssemblies>true</AotAssemblies>
     <BundleAssemblies>true</BundleAssemblies>
+    <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
+<AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
+<AndroidSupportedAbis>armeabi-v7a;x86</AndroidSupportedAbis>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CookieBar2">
@@ -84,8 +86,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activities\MainActivity.cs" />
-    <Compile Include="Activities\VideoStreamingActivity.cs" />
     <Compile Include="Controls\PlaySurfaceView.cs" />
     <Compile Include="Models\Data.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
@@ -94,6 +94,7 @@
     <Compile Include="Services\DataSingleton.cs" />
     <Compile Include="Services\SaveLoginSessionSingleton.cs" />
     <Compile Include="Services\StateObject.cs" />
+    <Compile Include="MainActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <AndroidNativeLibrary Include="lib\armeabi-v7a\libAudioEngine.so">
