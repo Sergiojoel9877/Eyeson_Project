@@ -90,6 +90,10 @@ namespace EyesonApp
         private static int Minute { get; set; }
         private static int Second { get; set; }
 
+        private static bool ValueForSingleStreamChannel { get; set; } = false;
+
+        private static bool AllowedToStream { get; set; } = true;
+
         private static int m_iStartChan { get; set; } = 0; // start channel no
         private static int m_iChanNum { get; set; } = 0; // channel number
         public bool CanShowDateDialog { get; private set; }
@@ -104,13 +108,9 @@ namespace EyesonApp
 
         private static PlaySurfaceView[] playView = new PlaySurfaceView[4];
 
-        private static Bundle SavedInstanceState;
-
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
-
-            SavedInstanceState = savedInstanceState;
 
             base.Window.RequestFeature(Android.Views.WindowFeatures.ActionBar);
 
@@ -423,6 +423,7 @@ namespace EyesonApp
             m_oRecordBtn = (Button)FindViewById(Resource.Id.btn_Record);
             m_IPAdrs = (TextView)FindViewById(Resource.Id.ipPlaceHolder);
             m_surface = (SurfaceView)FindViewById(Resource.Id.Sur_Player);
+            scrollView = (ScrollView)FindViewById(Resource.Id.scrollView2);
         }
 
         private void Record_Listener(object sender, EventArgs e)
@@ -489,12 +490,21 @@ namespace EyesonApp
             m_oCaptureBtn.Click += Capture_Listener;
         }
 
+
+        private void DisposeListeners()
+        {
+            m_oPreviewBtn.Click -= Preview_Listener;
+            m_oRecordBtn.Click -= Record_Listener;
+            m_oPlaybackBtn.Click -= PlaybackButtomCliked;
+            m_oCaptureBtn.Click -= Capture_Listener;
+        }
+
         private void PlaybackButtomCliked(object sender, EventArgs e)
         {
             object locker = new object();
             if (m_oPlaybackBtn.Text == "Stop")
             {
-                StopPlayback();
+                InvokeStopPlaybackDelegate();
             }
             else
             {
@@ -560,7 +570,9 @@ namespace EyesonApp
         {
             await Task.Delay(10);
 
-            StopPlayback();
+            //StopPlayback();
+
+            InvokeStopPlaybackDelegate();
 
             if (SaveOnResumeStateSingleton.ResumeStarted())
             {
@@ -574,6 +586,8 @@ namespace EyesonApp
                 {
                     Log.Error("EYESON APP", "please login on a device first");
                     ShowFancyMessage(GetApplicationContext(), "Please login first", Color: Resource.Color.error_color_material_light);
+                    await Task.Delay(2000);
+                    CookieBar.Dismiss(GetApplicationContext());
                     return;
                 }
 
@@ -583,10 +597,14 @@ namespace EyesonApp
                     {
                         Log.Info("EYESON APP", "Please stop preview first");
                         ShowFancyMessage(GetApplicationContext(), "Please stop Preview function first", Color: Resource.Color.error_color_material_light);
+                        await Task.Delay(2000);
+                        CookieBar.Dismiss(GetApplicationContext());
                         return;
                     }
 
                     ChangeSingleSurFace(true);
+
+                    ValueForSingleStreamChannel = true;
 
                     NET_DVR_TIME struBegin = new NET_DVR_TIME();
                     NET_DVR_TIME struEnd = new NET_DVR_TIME();
@@ -632,7 +650,10 @@ namespace EyesonApp
                             return;
                         }
                         m_bStopPlayback = false;
-                        m_oPlaybackBtn.Text = "Stop";
+
+                        RunOnUiThread(() => m_oPlaybackBtn.Text = "Stop");
+                      
+                        AllowedToStream = true;
 
                         new System.Threading.Thread(new ThreadStart(() =>
                         {
@@ -720,6 +741,8 @@ namespace EyesonApp
 
                     ChangeSingleSurFace(true);
 
+                    ValueForSingleStreamChannel = true;
+
                     NET_DVR_TIME struBegin = new NET_DVR_TIME();
                     NET_DVR_TIME struEnd = new NET_DVR_TIME();
 
@@ -795,7 +818,8 @@ namespace EyesonApp
                         }
                         
                         m_bStopPlayback = false;
-                        m_oPlaybackBtn.Text = "Stop";
+
+                        RunOnUiThread(() => m_oPlaybackBtn.Text = "Stop");
 
                         new System.Threading.Thread(new ThreadStart(() =>
                         {
@@ -853,94 +877,100 @@ namespace EyesonApp
             if (!IsThereInternetOnDevice())
                 return;
 
-            StopPlayback();
-           
-            Task.Run(()=>
+            InvokeStopPlaybackDelegate();
+
+            //Task.Run(async () =>
+            //{
+            //    await Task.Delay(100);
+
+            try
             {
-                try
+                //await Task.Run(() =>
+                //{
+                //    using (var h = new Handler(Looper.MainLooper))
+                //    {
+                //        h.Post(() => ;
+                //    }
+                //});
+
+                ChangeSingleSurFace(false);
+
+                ValueForSingleStreamChannel = false;
+
+                if (m_iLogID < 0)
                 {
-                    using (var h = new Handler(Looper.MainLooper))
+                    Log.Error("", "Please login in device first");
+                    ShowFancyMessage(GetApplicationContext(), "Please log in first", Color: Resource.Color.error_color_material_light);
+                    return;
+                }
+                if (m_iPlaybackID >= 0)
+                {
+                    Log.Info("", "Please stop palyback first");
+                    ShowFancyMessage(GetApplicationContext(), "Please stop playback first", Color: Resource.Color.error_color_material_light, Duration: 23000);
+                    return;
+                }
+
+                if (m_bNeedDecode)
+                {
+                    if (m_iChanNum > 1) //Preview more than a channel
                     {
-                        h.Post(()=>
+                        //CAMERA INDEX
+                        if (!m_bMultiPlay)
                         {
-                            ChangeSingleSurFace(false);
-                        });
-                    }
+                            StartMultiplePreview(4);
 
-                    if (m_iLogID < 0)
-                    {
-                        Log.Error("", "Please login in device first");
-                        ShowFancyMessage(GetApplicationContext(), "Please log in first", Color: Resource.Color.error_color_material_light);
-                        return;
-                    }
-                    if (m_iPlaybackID >= 0)
-                    {
-                        Log.Info("", "Please stop palyback first");
-                        ShowFancyMessage(GetApplicationContext(), "Please stop playback first", Color: Resource.Color.error_color_material_light, Duration: 23000);
-                        return;
-                    }
+                            m_bMultiPlay = true;
 
-                    if (m_bNeedDecode)
-                    {
-                        if (m_iChanNum > 1) //Preview more than a channel
-                        {
-                            //CAMERA INDEX
-                            if (!m_bMultiPlay)
+                            using (var h = new Handler(Looper.MainLooper))
                             {
-                                StartMultiplePreview(4);
-
-                                m_bMultiPlay = true;
-
-                                using (var h = new Handler(Looper.MainLooper))
+                                h.Post(()=>
                                 {
-                                    h.Post(()=>
-                                    {
-                                        m_oPreviewBtn.Text = "Stop";
-                                    });
-                                }
-                                OnResumePreviewStateSingleton.SetState(true);
+                                    m_oPreviewBtn.Text = "Stop";
+                                });
                             }
-                            else
-                            {
-                                StopmultiPreview();
-                                m_bMultiPlay = false;
-                                using (var h = new Handler(Looper.MainLooper))
-                                {
-                                    h.Post(() =>
-                                    {
-                                        m_oPreviewBtn.Text = "Preview";
-                                    });
-                                }
-                                OnResumePreviewStateSingleton.SetState(false);
-                            }
+                            OnResumePreviewStateSingleton.SetState(true);
                         }
                         else
                         {
-                            if (m_iPlayID < 0)
+                            StopmultiPreview();
+                            m_bMultiPlay = false;
+                            using (var h = new Handler(Looper.MainLooper))
                             {
-                                StartSinglePreview();
-                            }
-                            else
-                            {
-                                StopSinglePreview();
-
-                                using (var h = new Handler(Looper.MainLooper))
+                                h.Post(() =>
                                 {
-                                    h.Post(() =>
-                                    {
-                                        m_oPreviewBtn.Text = "Preview";
-                                    });
-                                }
-                                OnResumePreviewStateSingleton.SetState(false);
+                                    m_oPreviewBtn.Text = "Preview";
+                                });
                             }
+                            OnResumePreviewStateSingleton.SetState(false);
+                        }
+                    }
+                    else
+                    {
+                        if (m_iPlayID < 0)
+                        {
+                            StartSinglePreview();
+                        }
+                        else
+                        {
+                            StopSinglePreview();
+
+                            using (var h = new Handler(Looper.MainLooper))
+                            {
+                                h.Post(() =>
+                                {
+                                    m_oPreviewBtn.Text = "Preview";
+                                });
+                            }
+                            OnResumePreviewStateSingleton.SetState(false);
                         }
                     }
                 }
-                catch (System.Exception er)
-                {
-                    Log.Error("", "Error: " + er.ToString());
-                }
-            });
+            }
+            catch (System.Exception er)
+            {
+                Log.Error("", "Error: " + er.ToString());
+            }
+            //});
         }
 
         private void ResumePreviewAfterOnResume()
@@ -954,12 +984,11 @@ namespace EyesonApp
             {
                 try
                 {
+                    ValueForSingleStreamChannel = false;
+
                     using (var h = new Handler(Looper.MainLooper))
                     {
-                        h.Post(() =>
-                        {
-                            ChangeSingleSurFace(false);
-                        });
+                        h.Post(() => ChangeSingleSurFace(false));
                     }
 
                     if (m_iLogID < 0)
@@ -1044,7 +1073,9 @@ namespace EyesonApp
             {
                 Log.Error("EYESON APP", "net sdk stop playback failed");
             }
-            m_oPlaybackBtn.Text = "Play";
+
+            RunOnUiThread(() => m_oPlaybackBtn.Text = "Play");
+
             m_iPlaybackID = -1;
         }
 
@@ -1163,6 +1194,7 @@ namespace EyesonApp
             }
 
             Log.Info("", "NetSdk Play sucess ***************************************************");
+            
             m_oPreviewBtn.Text = "Stop";
         }
 
@@ -1469,8 +1501,16 @@ namespace EyesonApp
 
             Xamarin.Essentials.Connectivity.ConnectivityChanged -= Connectivity_ConnectivityChanged;
 
+            //DisposeListeners();
+
             if (m_oPlaybackBtn.Text != "Stop")
                 return;
+
+            AllowedToStream = true;
+
+            StopmultiPreview();
+
+            InvokeStopPlaybackDelegate();
 
             if (OnPauseStateSingleton.PauseStarted())
             {
@@ -1495,33 +1535,64 @@ namespace EyesonApp
             Xamarin.Essentials.Connectivity.ConnectivityChanged -= Connectivity_ConnectivityChanged;
             Xamarin.Essentials.Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
 
-            if (SaveOnResumeStateSingleton.ResumeStarted() /*&& DataSingleton.Instance().DisableOnResumeRendering != true*/)
+            //SetListeners();
+
+            if (AllowedToStream)
             {
-                StopPlayback();
+                if (SaveOnResumeStateSingleton.ResumeStarted() /*&& DataSingleton.Instance().DisableOnResumeRendering != true*/)
+                {
+                    StopPlayback();
 
-                _Timer.Stop();
+                    _Timer.Stop();
 
-                SecondsElapsed = _Timer.Elapsed.TotalSeconds;
+                    SecondsElapsed = _Timer.Elapsed.TotalSeconds;
 
-                ResumePlaybackAfterOnResume(StreamTimeElapsedOnRuntime, SecondsElapsed);
-              
-                SecondsElapsed = 0;
+                    ResumePlaybackAfterOnResume(StreamTimeElapsedOnRuntime, SecondsElapsed);
 
-                StreamTimeElapsedOnRuntime = 0;
-            }
+                    SecondsElapsed = 0;
 
-            if (m_oPreviewBtn.Text == "Stop" && OnResumePreviewStateSingleton.ResumeStarted())
-            {
-                RunOnUiThread(()=>
+                    StreamTimeElapsedOnRuntime = 0;
+
+                    AllowedToStream = false;
+                }
+
+                if (m_oPreviewBtn.Text == "Stop" && OnResumePreviewStateSingleton.ResumeStarted())
                 {
                     m_bMultiPlay = false;
+
                     InitPreviewListener(null, null);
-                }); 
+
+                    AllowedToStream = false;
+                }
+
+                OnPauseStateSingleton.SaveOnPauseState(false);
             }
 
-            OnPauseStateSingleton.SaveOnPauseState(false);
-
             Xamarin.Essentials.Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
+        }
+
+        public override void OnConfigurationChanged(Configuration newConfig)
+        {
+            base.OnConfigurationChanged(newConfig);
+            if(newConfig.Orientation == Android.Content.Res.Orientation.Portrait)
+            {
+                using (var h = new Handler(Looper.MainLooper))
+                {
+                    h.Post(() =>
+                    {
+                        ChangeSingleSurFace(ValueForSingleStreamChannel);   
+                    });
+                }
+            }else if(newConfig.Orientation == Android.Content.Res.Orientation.Landscape)
+            {
+                using (var h = new Handler(Looper.MainLooper))
+                {
+                    h.Post(() =>
+                    {
+                        ChangeSingleSurFace(ValueForSingleStreamChannel);
+                    });
+                }
+            }
         }
     }
 }
