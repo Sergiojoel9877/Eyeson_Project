@@ -128,6 +128,7 @@ namespace EyesonApp.Services
                 var json = match.Value;
 
                 Models.Data _data = JsonConvert.DeserializeObject<Models.Data>(json);
+                _data.DisableOnResumeRendering = true;
                 DataSingleton.SetInstance(_data);
 
                 memoryStream.Close();
