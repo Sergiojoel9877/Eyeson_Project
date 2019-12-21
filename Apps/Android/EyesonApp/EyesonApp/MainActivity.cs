@@ -144,7 +144,36 @@ namespace EyesonApp
 
             SetTimers();
 
+            ScrollScrollViewToTheBottom();
+
+            //CalculateOnTheFlySurfaceViewTopMargin();
+
             Xamarin.Essentials.Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
+        }
+
+        private void CalculateOnTheFlySurfaceViewTopMargin()
+        {
+            ConstraintLayout.LayoutParams _params = (ConstraintLayout.LayoutParams)m_surface.LayoutParameters;
+            _params.SetMargins(0, (m_surface.Height / 4), 0, 0);
+            m_surface.LayoutParameters = _params;
+        }
+
+        //public static void SetMargins(this View view, int l, int t, int r, int b)
+        //{
+        //    if (view.LayoutParameters.GetType() == typeof(ViewGroup.MarginLayoutParams))
+        //    {
+        //        ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams)view.LayoutParameters;
+        //        p.SetMargins(l, t, r, b);
+        //        view.RequestLayout();
+        //    }
+        //}
+
+        private void ScrollScrollViewToTheBottom()
+        {
+            scrollView.Post(() =>
+            {
+                scrollView.FullScroll(FocusSearchDirection.Down);
+            });
         }
 
         private void SetTimers()
